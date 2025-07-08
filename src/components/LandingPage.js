@@ -78,7 +78,7 @@ const LandingPage = () => {
     if (!userInfo) {
       navigate('/login');
     } else {
-      navigate('/upload');
+      navigate('/upload', { state: { dataType } });
     }
   };
 
@@ -347,7 +347,16 @@ const LandingPage = () => {
                   />
                 </Paper>
                 
-                <Paper sx={{ p: 1.5, mb: 1.5, opacity: 0.6, borderRadius: 2 }}>
+                <Paper 
+                  sx={{ 
+                    p: 1.5, 
+                    mb: 1.5, 
+                    border: dataType === 'EEG' ? '2px solid' : '1px solid',
+                    borderColor: dataType === 'EEG' ? 'primary.main' : 'divider',
+                    borderRadius: 2,
+                    bgcolor: dataType === 'EEG' ? 'primary.50' : 'transparent'
+                  }}
+                >
                   <FormControlLabel 
                     value="EEG" 
                     control={<Radio />} 
@@ -357,15 +366,23 @@ const LandingPage = () => {
                           EEG (Electroencephalography)
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                          Electrical activity monitoring - Coming Soon
+                          Electrical activity monitoring for seizure detection
                         </Typography>
                       </Box>
                     }
-                    disabled 
                   />
                 </Paper>
                 
-                <Paper sx={{ p: 1.5, mb: 1.5, opacity: 0.6, borderRadius: 2 }}>
+                <Paper 
+                  sx={{ 
+                    p: 1.5, 
+                    mb: 1.5, 
+                    border: dataType === 'PET' ? '2px solid' : '1px solid',
+                    borderColor: dataType === 'PET' ? 'primary.main' : 'divider',
+                    borderRadius: 2,
+                    bgcolor: dataType === 'PET' ? 'primary.50' : 'transparent'
+                  }}
+                >
                   <FormControlLabel 
                     value="PET" 
                     control={<Radio />} 
@@ -375,11 +392,10 @@ const LandingPage = () => {
                           PET (Positron Emission Tomography)
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                          Metabolic brain imaging - Coming Soon
+                          Metabolic brain imaging for functional analysis
                         </Typography>
                       </Box>
                     }
-                    disabled 
                   />
                 </Paper>
               </RadioGroup>
@@ -390,7 +406,6 @@ const LandingPage = () => {
                 size="medium"
                 fullWidth
                 onClick={handleProceed}
-                disabled={dataType !== 'MRI'}
                 sx={{ 
                   py: 1,
                   fontSize: '0.95rem',
@@ -398,7 +413,7 @@ const LandingPage = () => {
                   borderRadius: 2
                 }}
               >
-                Begin MRI Analysis Workflow
+                Begin {dataType} Analysis Workflow
               </Button>
             </CardContent>
           </Card>

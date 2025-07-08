@@ -12,12 +12,9 @@ import {
   Chip,
   Grid,
   Paper,
-  Divider,
-  IconButton,
-  ToggleButton,
-  ToggleButtonGroup
+  Divider
 } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   CloudUpload, 
   Folder, 
@@ -25,29 +22,31 @@ import {
   Description,
   Image as ImageIcon,
   CheckCircle,
-  Warning,
   Info,
-  PsychologyAlt,
-  CameraAlt
+  PsychologyAlt
 } from '@mui/icons-material';
 import { useFiles } from '../App';
 
 const EEG_FILE_TYPES = '.edf,.csv,.mat,.txt';
 const MRI_FILE_TYPES = 'image/*,.nii,.nii.gz,.dcm';
+const PET_FILE_TYPES = 'image/*,.dcm,.nii,.nii.gz';
 
 const UploadPage = () => {
   const [files, setFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [dataType, setDataType] = useState('MRI');
   const navigate = useNavigate();
+  const location = useLocation();
   const { uploadedFiles, setUploadedFiles, clearFiles } = useFiles();
+  
+  // Get dataType from navigation state, default to MRI
+  const dataType = location.state?.dataType || 'MRI';
 
   // Log existing uploaded files for debugging
   console.log('UploadPage - existing uploadedFiles:', uploadedFiles);
+  console.log('UploadPage - dataType from navigation:', dataType);
  
   const processFiles = (selectedFiles) => {
-    // Create file objects with metadata and blob URLs for persistence
     const processedFiles = selectedFiles.map(file => ({
       id: `${file.name}-${file.size}-${Date.now()}`,
       name: file.name,
@@ -56,7 +55,7 @@ const UploadPage = () => {
       lastModified: file.lastModified,
       blobUrl: URL.createObjectURL(file),
       originalFile: file,
-      dataType // Store whether MRI or EEG
+      dataType: dataType, // Use current dataType
     }));
     return processedFiles;
   };
@@ -130,6 +129,61 @@ const UploadPage = () => {
     return <Description sx={{ color: 'text.secondary' }} />;
   };
 
+  const getFileTypes = () => {
+    switch (dataType) {
+      case 'EEG':
+        return EEG_FILE_TYPES;
+      case 'PET':
+        return PET_FILE_TYPES;
+      default:
+        return MRI_FILE_TYPES;
+    }
+  };
+
+  const getDataTypeDescription = () => {
+    switch (dataType) {
+      case 'EEG':
+        return 'Choose your EEG files. Supported formats: EDF, CSV, MAT, TXT.';
+      case 'PET':
+        return 'Choose your PET images or DICOM files. Supported formats: JPEG, PNG, NIfTI (.nii, .nii.gz), DICOM (.dcm).';
+      default:
+        return 'Choose your MRI images or DICOM files. Supported formats: JPEG, PNG, NIfTI (.nii, .nii.gz), DICOM (.dcm).';
+    }
+  };
+
+  const getSupportedFormats = () => {
+    switch (dataType) {
+      case 'EEG':
+        return [
+          '• EDF (European Data Format)',
+          '• CSV, MAT, TXT files'
+        ];
+      case 'PET':
+        return [
+          '• JPEG, PNG, TIFF images',
+          '• NIfTI files (.nii, .nii.gz)',
+          '• DICOM files (.dcm)'
+        ];
+      default:
+        return [
+          '• JPEG, PNG, TIFF images',
+          '• NIfTI files (.nii, .nii.gz)',
+          '• DICOM files (.dcm)'
+        ];
+    }
+  };
+
+  const getRecommendedSize = () => {
+    switch (dataType) {
+      case 'EEG':
+        return 'Typical EEG files are 1-100 MB';
+      case 'PET':
+        return '50-150 images for optimal results';
+      default:
+        return '100-200 images for optimal results';
+    }
+  };
+
   // Add or update clinical note for a file
   const handleNoteChange = (fileId, note) => {
     setUploadedFiles(prevFiles => prevFiles.map(f => f.id === fileId ? { ...f, clinicalNote: note } : f));
@@ -146,19 +200,6 @@ const UploadPage = () => {
                 <Typography variant="h4" sx={{ fontWeight: 700, color: 'white' }}>
                   Upload {dataType} Data
                 </Typography>
-                <ToggleButtonGroup
-                  value={dataType}
-                  exclusive
-                  onChange={(_, val) => val && setDataType(val)}
-                  sx={{ bgcolor: 'rgba(255,255,255,0.1)', borderRadius: 2 }}
-                >
-                  <ToggleButton value="MRI" sx={{ fontWeight: 600, px: 3 }}>
-                    <CameraAlt sx={{ mr: 1 }} /> MRI
-                  </ToggleButton>
-                  <ToggleButton value="EEG" sx={{ fontWeight: 600, px: 3 }}>
-                    <PsychologyAlt sx={{ mr: 1 }} /> EEG
-                  </ToggleButton>
-                </ToggleButtonGroup>
               </Box>
               <Typography variant="body1" sx={{ color: 'rgba(255, 255, 255, 0.95)', mb: 2 }}>
                 Upload your {dataType} data for advanced analysis
@@ -176,7 +217,7 @@ const UploadPage = () => {
                 />
                 <Chip 
                   icon={<Info />}
-                  label={dataType === 'MRI' ? 'MRI Formats Supported' : 'EEG Formats Supported'} 
+                  label={`${dataType} Formats Supported`} 
                   sx={{ bgcolor: 'rgba(255, 255, 255, 0.2)', color: 'white', fontWeight: 600 }}
                 />
               </Box>
@@ -253,9 +294,7 @@ const UploadPage = () => {
               </Typography>
               
               <Typography variant="body2" color="text.secondary" sx={{ mb: 4, lineHeight: 1.6 }}>
-                {dataType === 'MRI'
-                  ? 'Choose your MRI images or DICOM files. Supported formats: JPEG, PNG, NIfTI (.nii, .nii.gz), DICOM (.dcm).'
-                  : 'Choose your EEG files. Supported formats: EDF, CSV, MAT, TXT.'}
+                {getDataTypeDescription()}
               </Typography>
 
               {/* Upload Buttons */}
@@ -274,7 +313,7 @@ const UploadPage = () => {
                       type="file"
                       hidden
                       multiple
-                      accept={dataType === 'MRI' ? MRI_FILE_TYPES : EEG_FILE_TYPES}
+                      accept={getFileTypes()}
                       onChange={handleFileChange}
                     />
                   </Button>
@@ -295,7 +334,7 @@ const UploadPage = () => {
                       hidden
                       webkitdirectory=""
                       multiple
-                      accept={dataType === 'MRI' ? MRI_FILE_TYPES : EEG_FILE_TYPES}
+                      accept={getFileTypes()}
                       onChange={handleFolderUpload}
                     />
                   </Button>
@@ -397,10 +436,10 @@ const UploadPage = () => {
                   : (files.length === 0 && uploadedFiles.length === 0)
                     ? 'Select Files to Continue'
                     : uploadedFiles.length > 0 && files.length === 0
-                      ? `Begin Analysis with ${uploadedFiles.length} ${uploadedFiles.length === 1 ? (uploadedFiles[0].dataType || dataType) : 'Files'}`
+                      ? `Begin Analysis with ${uploadedFiles.length} ${uploadedFiles.length === 1 ? `${dataType} File` : `${dataType} Files`}`
                       : files.length === 1
-                        ? 'Begin Analysis with 1 New File'
-                        : `Begin Analysis with ${files.length} New Files`
+                        ? `Begin Analysis with 1 New ${dataType} File`
+                        : `Begin Analysis with ${files.length} New ${dataType} Files`
                 }
               </Button>
             </CardContent>
@@ -420,28 +459,11 @@ const UploadPage = () => {
                   Supported Formats:
                 </Typography>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                  {dataType === 'MRI' ? (
-                    <>
-                      <Typography variant="body2" color="text.secondary">
-                        • JPEG, PNG, TIFF images
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        • NIfTI files (.nii, .nii.gz)
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        • DICOM files (.dcm)
-                      </Typography>
-                    </>
-                  ) : (
-                    <>
-                      <Typography variant="body2" color="text.secondary">
-                        • EDF (European Data Format)
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        • CSV, MAT, TXT
-                      </Typography>
-                    </>
-                  )}
+                  {getSupportedFormats().map((format, index) => (
+                    <Typography key={index} variant="body2" color="text.secondary">
+                      {format}
+                    </Typography>
+                  ))}
                 </Box>
               </Box>
 
@@ -452,9 +474,7 @@ const UploadPage = () => {
                   Recommended Size:
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {dataType === 'MRI'
-                    ? '100-200 images for optimal results'
-                    : 'Typical EEG files are 1-100 MB'}
+                  {getRecommendedSize()}
                 </Typography>
               </Box>
 

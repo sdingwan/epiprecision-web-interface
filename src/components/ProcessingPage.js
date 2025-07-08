@@ -16,20 +16,9 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useFiles } from '../App';
 import { 
-  Timeline, 
-  TimelineDot, 
-  TimelineConnector, 
-  TimelineItem, 
-  TimelineSeparator, 
-  TimelineContent 
-} from '@mui/lab';
-import { 
   Science, 
-  PlayCircleFilledWhite, 
-  CheckCircle, 
   FolderSpecial, 
   CloudUpload, 
-  PsychologyAlt, 
   Assessment 
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
@@ -177,7 +166,7 @@ const ProcessingPage = () => {
                   onClick={() => navigate('/results')}
                  
                 >
-                  Review & Download
+                  Review
                 </Button>
               </>
             )}

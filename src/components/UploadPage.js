@@ -124,7 +124,7 @@ const UploadPage = () => {
       return <PsychologyAlt sx={{ color: 'secondary.main' }} />;
     }
     if (file.type && file.type.startsWith('image/')) {
-      return <ImageIcon sx={{ color: 'primary.main' }} />;
+      return <ImageIcon sx={{ color: '#e0e0e0' }} />;
     }
     return <Description sx={{ color: 'text.secondary' }} />;
   };
@@ -194,7 +194,7 @@ const UploadPage = () => {
       <Grid container maxWidth="lg" spacing={4} sx={{ mx: 'auto' }}>
         {/* Header Section */}
         <Grid item xs={12}>
-          <Card sx={{ mb: 3, background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)', color: 'white' }}>
+          <Card sx={{ mb: 3, background: '#1a1a1a', color: '#e0e0e0', border: '1px solid #333333' }}>
             <CardContent sx={{ p: 4 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
                 <Typography variant="h4" sx={{ fontWeight: 700, color: 'white' }}>
@@ -205,16 +205,6 @@ const UploadPage = () => {
                 Upload your {dataType} data for advanced analysis
               </Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
-                <Chip 
-                  icon={<CheckCircle />}
-                  label="Secure Platform" 
-                  sx={{ bgcolor: 'rgba(255, 255, 255, 0.9)', color: '#2e7d32', fontWeight: 600 }}
-                />
-                <Chip 
-                  icon={<CheckCircle />}
-                  label="Secure Upload" 
-                  sx={{ bgcolor: 'rgba(255, 255, 255, 0.9)', color: '#2e7d32', fontWeight: 600 }}
-                />
                 <Chip 
                   icon={<Info />}
                   label={`${dataType} Formats Supported`} 
@@ -276,10 +266,15 @@ const UploadPage = () => {
                               width: '100%',
                               padding: '8px',
                               borderRadius: '6px',
-                              border: '1px solid #e0e0e0',
+                              border: '1px solid #888888',
                               fontSize: '0.95rem',
-                              marginTop: 2
+                              marginTop: 2,
+                              backgroundColor: '#1a1a1a',
+                              color: '#e0e0e0',
+                              outline: 'none',
                             }}
+                            onFocus={e => e.target.style.border = '2px solid #00ffff'}
+                            onBlur={e => e.target.style.border = '1px solid #888888'}
                           />
                         </Box>
                       </ListItem>
@@ -301,12 +296,34 @@ const UploadPage = () => {
               <Grid container spacing={2} sx={{ mb: 4 }}>
                 <Grid item xs={12} sm={6}>
                   <Button
-                    variant="contained"
+                    variant="outlined"
                     component="label"
                     startIcon={<CloudUpload />}
                     size="large"
                     fullWidth
-                    sx={{ py: 2, borderRadius: 2 }}
+                    sx={{
+                      py: 2,
+                      borderRadius: 2,
+                      backgroundColor: '#1a1a1a',
+                      color: '#e0e0e0',
+                      border: files.length > 0 ? '2px solid #00ffff' : '2px solid #333333',
+                      boxShadow: 'none',
+                      '&:hover': {
+                        backgroundColor: '#222',
+                        borderColor: '#00ffff',
+                        boxShadow: '0 0 12px 3px #00ffff88',
+                      },
+                      '&:focus': {
+                        borderColor: '#00ffff',
+                        boxShadow: '0 0 0 2px #00ffff44',
+                      },
+                      '&.Mui-disabled': {
+                        color: '#e0e0e0',
+                        border: '2px solid #333333',
+                        backgroundColor: '#222',
+                        opacity: 0.5,
+                      },
+                    }}
                   >
                     Select Individual Files
                     <input
@@ -318,7 +335,6 @@ const UploadPage = () => {
                     />
                   </Button>
                 </Grid>
-
                 <Grid item xs={12} sm={6}>
                   <Button
                     variant="outlined"
@@ -326,7 +342,29 @@ const UploadPage = () => {
                     startIcon={<Folder />}
                     size="large"
                     fullWidth
-                    sx={{ py: 2, borderRadius: 2 }}
+                    sx={{
+                      py: 2,
+                      borderRadius: 2,
+                      backgroundColor: '#1a1a1a',
+                      color: '#e0e0e0',
+                      border: files.length > 0 ? '2px solid #00ffff' : '2px solid #333333',
+                      boxShadow: 'none',
+                      '&:hover': {
+                        backgroundColor: '#222',
+                        borderColor: '#00ffff',
+                        boxShadow: '0 0 12px 3px #00ffff88',
+                      },
+                      '&:focus': {
+                        borderColor: '#00ffff',
+                        boxShadow: '0 0 0 2px #00ffff44',
+                      },
+                      '&.Mui-disabled': {
+                        color: '#e0e0e0',
+                        border: '2px solid #333333',
+                        backgroundColor: '#222',
+                        opacity: 0.5,
+                      },
+                    }}
                   >
                     Select Folder
                     <input
@@ -343,26 +381,32 @@ const UploadPage = () => {
 
               {/* File Count Display */}
               {files.length > 0 && (
-                <Box sx={{ mb: 3 }}>
+                <Box sx={{ mb: 3, mt: 2 }}>
                   <Chip 
                     label={getFileCountMessage()} 
-                    color="primary"
+                    sx={{
+                      fontSize: '0.9rem',
+                      fontWeight: 600,
+                      backgroundColor: '#1a1a1a',
+                      color: '#00ffff',
+                      border: '2px solid #00ffff',
+                      boxShadow: '0 0 8px 2px #00ffff55',
+                    }}
                     size="medium"
-                    sx={{ fontSize: '0.9rem', fontWeight: 600 }}
                   />
                 </Box>
               )}
 
               {/* Upload Progress */}
               {uploading && (
-                <Paper sx={{ p: 3, mb: 3, bgcolor: 'grey.50' }}>
+                <Paper sx={{ p: 3, mb: 3, bgcolor: '#1a1a1a' }}>
                   <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>
                     Uploading {files.length} {files.length === 1 ? 'file' : 'files'}...
                   </Typography>
                   <LinearProgress 
                     variant="determinate" 
                     value={uploadProgress} 
-                    sx={{ height: 8, borderRadius: 1, mb: 1 }}
+                    sx={{ height: 8, borderRadius: 1, mb: 1, backgroundColor: '#222', '& .MuiLinearProgress-bar': { backgroundColor: '#00ffff' } }}
                   />
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <Typography variant="body2" color="text.secondary">
@@ -377,16 +421,16 @@ const UploadPage = () => {
 
               {/* File List (show first 10 and summary) */}
               {files.length > 0 && !uploading && (
-                <Paper sx={{ p: 3, mb: 3, bgcolor: 'success.50', border: '1px solid', borderColor: 'success.200' }}>
-                  <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: 'success.main' }}>
+                <Paper sx={{ p: 3, mb: 3, bgcolor: '#1a1a1a', border: '1px solid #333333' }}>
+                  <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: '#00ffff' }}>
                     New Files Ready ({files.length} total - {getTotalFileSize(files)} MB)
                   </Typography>
                   <Box sx={{ 
                     maxHeight: 200, 
                     overflow: 'auto', 
-                    border: '1px solid #e0e0e0', 
+                    border: '1px solid #333333', 
                     borderRadius: 1,
-                    bgcolor: 'white'
+                    bgcolor: '#222'
                   }}>
                     <List dense>
                       {files.slice(0, 10).map((file, idx) => (
@@ -405,7 +449,7 @@ const UploadPage = () => {
                         </ListItem>
                       ))}
                       {files.length > 10 && (
-                        <ListItem sx={{ py: 1, bgcolor: 'grey.50' }}>
+                        <ListItem sx={{ py: 1, bgcolor: '#222' }}>
                           <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
                             ... and {files.length - 10} more files
                           </Typography>
@@ -418,17 +462,27 @@ const UploadPage = () => {
 
               {/* Proceed Button */}
               <Button
-                variant="contained"
-                color="primary"
+                variant="outlined"
                 size="large"
                 fullWidth
                 onClick={() => navigate('/processing')}
                 disabled={(files.length === 0 && uploadedFiles.length === 0) || uploading}
-                sx={{ 
+                sx={{
                   py: 1.5,
                   fontSize: '1rem',
+                  backgroundColor: '#1a1a1a',
+                  color: '#e0e0e0',
+                  border: (files.length > 0 || uploadedFiles.length > 0) && !uploading ? '2px solid #00ffff' : '2px solid #333333',
+                  boxShadow: 'none',
                   fontWeight: 600,
-                  borderRadius: 2
+                  borderRadius: 2,
+                  '&:hover': { backgroundColor: '#222', borderColor: '#00ffff', boxShadow: '0 0 12px 3px #00ffff88' },
+                  '&.Mui-disabled': {
+                    color: '#e0e0e0',
+                    border: '2px solid #333333',
+                    backgroundColor: '#222',
+                    opacity: 0.5,
+                  },
                 }}
               >
                 {uploading 
@@ -514,7 +568,13 @@ const UploadPage = () => {
                   <Chip 
                     label={uploading ? "Uploading" : "Ready"} 
                     size="small" 
-                    color={uploading ? "warning" : "success"}
+                    sx={{
+                      backgroundColor: '#1a1a1a',
+                      color: '#00ffff',
+                      border: '2px solid #00ffff',
+                      boxShadow: '0 0 8px 2px #00ffff55',
+                      fontWeight: 600,
+                    }}
                   />
                 </Box>
               </CardContent>

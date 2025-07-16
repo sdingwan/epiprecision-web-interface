@@ -1,14 +1,14 @@
 # EpiPrecision Web Interface
 
-A React-based web interface for MRI data analysis using MELODIC IC processing for epilepsy research.
+A React-based web interface for MRI data analysis using AI-powered IC processing for epilepsy research.
 
 ## Project Overview
 
 This application provides a user-friendly interface for:
 - Uploading MRI data (100-200 images)
-- Running MELODIC IC Analysis
+- Running AI-powered IC Analysis
 - Processing data with EpiPrecision AI
-- Classifying images into Normal, Noise, and SOZ (Seizure Onset Zone) folders
+- Classifying images into RSN, Noise, and SOZ (Seizure Onset Zone) folders
 
 ## Project Structure
 
@@ -21,7 +21,7 @@ src/
     ├── Navbar.js             # Navigation bar
     ├── LandingPage.js        # Login/data type selection
     ├── UploadPage.js         # MRI image upload
-    ├── ProcessingPage.js     # MELODIC & EPIK processing
+    ├── ProcessingPage.js     # AI-powered processing
     ├── ResultsPage.js        # Final results display
     └── ICReferenceTable.js   # IC types reference table
 
@@ -59,13 +59,13 @@ public/
 
 ### 3. Processing Page
 - Step-by-step workflow with progress indicators
-- Run MELODIC button (simulated processing)
+- Run AI Analysis button (simulated processing)
 - Run EPIK button (simulated processing)
 - Folder creation visualization
 
 ### 4. Results Page
 - Display of master folder with 3 subfolders:
-  - Normal Folder (blue)
+  - RSN Folder (blue)
   - Noise Folder (orange)
   - SOZ Folder (pink)
 - IC Reference Table with visual examples
@@ -94,12 +94,12 @@ The project is structured to easily integrate backend APIs:
 
 Currently, all processing is simulated with timeouts for demonstration purposes:
 - File uploads show selected files but don't upload to server
-- MELODIC and EPIK processing show progress indicators
+- AI and EPIK processing show progress indicators
 - Folder creation is visual only
 
 ## Future Enhancements
 
-- Connect to actual MELODIC processing backend
+- Connect to actual AI processing backend
 - Implement real file upload with progress tracking
 - Add user authentication system
 - Integrate with EpiPrecision AI models

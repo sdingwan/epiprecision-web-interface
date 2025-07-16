@@ -209,7 +209,7 @@ const LoginPage = () => {
       justifyContent="center" 
       alignItems="center" 
       minHeight="90vh"
-      sx={{ backgroundColor: '#f5f5f5', py: 4 }}
+      sx={{ backgroundColor: '#0a0a0a', py: 4 }}
     >
       <Card sx={{ minWidth: 400, maxWidth: 500, width: '100%', mx: 2 }}>
         <CardContent sx={{ p: 4 }}>

@@ -21,24 +21,24 @@ export const useFiles = () => {
   return context;
 };
 
-const AI_CATEGORIES = [
-  { key: 'normal', color: 'green', label: 'Normal', aiExplanation: 'No abnormality detected.', aiHeatmap: 'https://via.placeholder.com/60x60/e8f5e9/43a047?text=Normal' },
-  { key: 'noise', color: 'yellow', label: 'Noisy', aiExplanation: 'Motion artifact detected.', aiHeatmap: 'https://via.placeholder.com/60x60/fffde7/fbc02d?text=Noisy' },
-  { key: 'review', color: 'red', label: 'Needs Review', aiExplanation: 'Potential SOZ detected. Please review.', aiHeatmap: 'https://via.placeholder.com/60x60/ffebee/e53935?text=Review' }
+  const AI_CATEGORIES = [
+    { key: 'rsn', color: 'green', label: 'RSN', aiExplanation: 'Clusters on grey matter.', aiHeatmap: '/AIHeatmap.png' },
+    { key: 'noise', color: 'yellow', label: 'Noise', aiExplanation: 'Motion artifact detected.', aiHeatmap: '/AIHeatmap.png' },
+    { key: 'soz', color: 'red', label: 'SOZ', aiExplanation: 'Potential SOZ detected. Please review.', aiHeatmap: '/AIHeatmap.png' }
 ];
 
 const FileProvider = ({ children }) => {
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [folderData, setFolderData] = useState({
-    normal: [],
+    rsn: [],
     noise: [],
-    review: []
+    soz: []
   });
   const [processingComplete, setProcessingComplete] = useState(false);
 
   const clearFiles = () => {
     setUploadedFiles([]);
-    setFolderData({ normal: [], noise: [], review: [] });
+    setFolderData({ rsn: [], noise: [], soz: [] });
     setProcessingComplete(false);
   };
 
@@ -46,13 +46,13 @@ const FileProvider = ({ children }) => {
     // Ensure we have files to distribute
     if (!uploadedFiles || uploadedFiles.length === 0) {
       console.warn("No files to distribute");
-      setFolderData({ normal: [], noise: [], review: [] });
+      setFolderData({ rsn: [], noise: [], soz: [] });
       setProcessingComplete(true);
       return;
     }
     
     // Simulate AI output: assign each file a random category, explanation, and heatmap
-    const categorized = { normal: [], noise: [], review: [] };
+    const categorized = { rsn: [], noise: [], soz: [] };
     uploadedFiles.forEach(file => {
       const ai = AI_CATEGORIES[Math.floor(Math.random() * AI_CATEGORIES.length)];
       const fileWithAI = {
@@ -65,9 +65,9 @@ const FileProvider = ({ children }) => {
     });
     
     setFolderData({
-      normal: categorized.normal || [],
+      rsn: categorized.rsn || [],
       noise: categorized.noise || [],
-      review: categorized.review || []
+      soz: categorized.soz || []
     });
     setProcessingComplete(true);
   };

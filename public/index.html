@@ -4,17 +4,67 @@
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
+    <meta name="theme-color" content="#0a0a0a" />
+    <meta name="color-scheme" content="dark" />
     <meta
       name="description"
-      content="EpiPrecision Web Interface for MRI analysis and MELODIC IC processing"
+      content="EpiPrecision Web Interface for MRI analysis and AI-powered IC processing - Radiology Room Experience"
     />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     <title>EpiPrecision Web Interface</title>
+    <style>
+      /* Prevent flash of white on load */
+      html, body {
+        background-color: #0a0a0a;
+        color: #e0e0e0;
+      }
+      
+      /* Loading spinner for better UX */
+      #loading {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: #4fc3f7;
+        font-family: 'Inter', sans-serif;
+        font-size: 18px;
+        z-index: 9999;
+      }
+      
+      .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #333333;
+        border-top: 4px solid #4fc3f7;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="loading">
+      <div class="spinner"></div>
+      <div>Loading EpiPrecision...</div>
+    </div>
     <div id="root"></div>
+    <script>
+      // Hide loading spinner once React app loads
+      window.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+          const loading = document.getElementById('loading');
+          if (loading) {
+            loading.style.display = 'none';
+          }
+        }, 1000);
+      });
+    </script>
   </body>
 </html> 

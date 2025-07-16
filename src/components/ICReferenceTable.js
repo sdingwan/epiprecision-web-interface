@@ -12,10 +12,10 @@ const ICReferenceTable = () => {
       <Box sx={{ 
         maxWidth: '800px', 
         width: '100%',
-        border: '2px solid #333',
+        border: '2px solid #444444',
         borderRadius: 2,
         overflow: 'hidden',
-        bgcolor: 'white'
+        bgcolor: '#1a1a1a'
       }}>
         <img 
           src="/ic-reference-table.png" 

@@ -51,32 +51,32 @@ const ResultsPage = () => {
 
   const folders = [
     {
-      id: 'normal',
-      name: 'Normal',
+      id: 'rsn',
+      name: 'RSN',
       color: '#e8f5e9',
       borderColor: '#43a047',
-      description: 'No abnormality detected',
-      files: folderData?.normal || [],
+      description: 'Clusters on grey matter (Resting State Network)',
+      files: folderData?.rsn || [],
       badgeColor: 'success',
       icon: '✓'
     },
     {
       id: 'noise',
-      name: 'Noisy', 
+      name: 'Noise', 
       color: '#fffde7',
       borderColor: '#fbc02d',
-      description: 'Motion artifact or noise detected',
+      description: 'Small clusters on white matter and brain periphery',
       files: folderData?.noise || [],
       badgeColor: 'warning',
       icon: '⚠'
     },
     {
-      id: 'review',
-      name: 'Needs Review',
+      id: 'soz',
+      name: 'SOZ',
       color: '#ffebee',
       borderColor: '#e53935',
-      description: 'Potential SOZ detected - requires review',
-      files: folderData?.review || [],
+      description: 'Large cluster on both grey and white matter (Seizure Onset Zone)',
+      files: folderData?.soz || [],
       badgeColor: 'error',
       icon: '!'
     }
@@ -107,9 +107,9 @@ const ResultsPage = () => {
   const getTotalFileCount = () => {
     if (!folderData) return 0;
     return (
-      (Array.isArray(folderData.normal) ? folderData.normal.length : 0) + 
+      (Array.isArray(folderData.rsn) ? folderData.rsn.length : 0) + 
       (Array.isArray(folderData.noise) ? folderData.noise.length : 0) + 
-      (Array.isArray(folderData.review) ? folderData.review.length : 0)
+      (Array.isArray(folderData.soz) ? folderData.soz.length : 0)
     );
   };
 
@@ -146,57 +146,176 @@ const ResultsPage = () => {
   // PDF generation
   const handleDownloadPDF = async () => {
     const doc = new jsPDF();
-    let y = 10;
-    doc.setFontSize(18);
-    doc.text('EpiPrecision AI Report', 14, y);
-    y += 10;
-    doc.setFontSize(12);
-    doc.text(`Date: ${new Date().toLocaleString()}`, 14, y);
-    y += 10;
-    // For each folder
+    let y = 20;
+    const pageHeight = 297; // A4 height in mm
+    const pageWidth = 210; // A4 width in mm
+    const margin = 20;
+    const contentWidth = pageWidth - (margin * 2);
+
+    // Helper function to check if we need a new page
+    const checkNewPage = (requiredSpace = 40) => {
+      if (y + requiredSpace > pageHeight - margin) {
+        doc.addPage();
+        y = margin;
+        return true;
+      }
+      return false;
+    };
+
+    // Header
+    doc.setFontSize(22);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(25, 118, 210); // Primary blue
+    doc.text('EpiPrecision AI Analysis Report', margin, y);
+    y += 15;
+
+    // Date and summary
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(100, 100, 100);
+    doc.text(`Generated: ${new Date().toLocaleString()}`, margin, y);
+    y += 8;
+    doc.text(`Total Files Analyzed: ${uploadedFiles.length}`, margin, y);
+    y += 8;
+    doc.text(`Categories: ${folders.filter(f => f.files.length > 0).length} active`, margin, y);
+    y += 20;
+
+    // Draw separator line
+    doc.setDrawColor(200, 200, 200);
+    doc.line(margin, y - 5, pageWidth - margin, y - 5);
+    y += 5;
+
+    // Process each folder category
     for (const folder of folders) {
       if (!folder.files || folder.files.length === 0) continue;
-      doc.setFontSize(14);
-      doc.setTextColor(40, 40, 40);
-      y += 10;
-      doc.text(folder.name, 14, y);
-      y += 4;
+
+      checkNewPage(30);
+
+      // Category header
+      doc.setFontSize(16);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(60, 60, 60);
+      doc.text(`${folder.name} Category`, margin, y);
+      y += 8;
+
       doc.setFontSize(10);
-      for (const file of folder.files) {
-        y += 8;
-        // Image
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(120, 120, 120);
+      doc.text(`${folder.description} • ${folder.files.length} file${folder.files.length !== 1 ? 's' : ''}`, margin, y);
+      y += 15;
+
+      // Process each file in this category
+      for (let i = 0; i < folder.files.length; i++) {
+        const file = folder.files[i];
+        
+        checkNewPage(60); // Ensure enough space for file entry
+
+        // File entry background
+        doc.setFillColor(248, 249, 250);
+        doc.rect(margin, y - 5, contentWidth, 50, 'F');
+        
+        // File thumbnail area
+        const imgX = margin + 5;
+        const imgY = y;
+        const imgSize = 30;
+
+        // Add image if available
         if (file.blobUrl) {
           try {
             const imgData = await getImageDataUrl(file.blobUrl);
-            doc.addImage(imgData, 'JPEG', 14, y, 24, 24);
-          } catch (e) {}
+            doc.addImage(imgData, 'JPEG', imgX, imgY, imgSize, imgSize);
+          } catch (e) {
+            // Draw placeholder if image fails
+            doc.setDrawColor(200, 200, 200);
+            doc.rect(imgX, imgY, imgSize, imgSize);
+            doc.setFontSize(8);
+            doc.setTextColor(150, 150, 150);
+            doc.text('No Image', imgX + 8, imgY + 18);
+          }
+        } else {
+          // Draw placeholder
+          doc.setDrawColor(200, 200, 200);
+          doc.rect(imgX, imgY, imgSize, imgSize);
+          doc.setFontSize(8);
+          doc.setTextColor(150, 150, 150);
+          doc.text('No Image', imgX + 8, imgY + 18);
         }
-        // Heatmap
-        if (file.aiHeatmap) {
-          try {
-            const heatmapData = await getImageDataUrl(file.aiHeatmap);
-            doc.addImage(heatmapData, 'JPEG', 40, y, 24, 24);
-          } catch (e) {}
-        }
-        // Text info
+
+        // File information area
+        const textX = imgX + imgSize + 10;
+        let textY = y + 5;
+
+        // File name
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'bold');
         doc.setTextColor(40, 40, 40);
-        doc.text(`File: ${file.name}`, 70, y + 6);
-        doc.text(`Type: ${file.dataType || ''}`, 70, y + 12);
-        doc.text(`Category: ${file.aiCategory || ''}`, 70, y + 18);
-        doc.text(`Approval: ${file.clinicianApproval || 'Pending'}`, 120, y + 6);
-        doc.text(`Clinical Note: ${file.clinicalNote || '-'}`, 120, y + 12);
-        doc.text('Explanation:', 70, y + 24);
-        doc.setFont('helvetica', 'italic');
-        doc.text(`${file.clinicianExplanation !== undefined ? file.clinicianExplanation : file.aiExplanation}`, 90, y + 24, { maxWidth: 100 });
+        const fileName = file.name.length > 35 ? file.name.substring(0, 35) + '...' : file.name;
+        doc.text(`File: ${fileName}`, textX, textY);
+        textY += 6;
+
+        // File details
+        doc.setFontSize(9);
         doc.setFont('helvetica', 'normal');
-        y += 28;
-        if (y > 250) {
-          doc.addPage();
-          y = 10;
+        doc.setTextColor(80, 80, 80);
+        doc.text(`Type: ${file.dataType || 'Unknown'}`, textX, textY);
+        textY += 5;
+        doc.text(`Category: ${folder.name}`, textX, textY);
+        textY += 5;
+        doc.text(`Status: ${file.clinicianApproval || 'Pending Review'}`, textX, textY);
+        textY += 8;
+
+        // Clinical note (if available)
+        if (file.clinicalNote) {
+          doc.setFont('helvetica', 'bold');
+          doc.setTextColor(60, 60, 60);
+          doc.text('Clinical Note:', textX, textY);
+          textY += 5;
+          
+          doc.setFont('helvetica', 'normal');
+          doc.setTextColor(40, 40, 40);
+          const clinicalNote = file.clinicalNote.length > 50 ? file.clinicalNote.substring(0, 50) + '...' : file.clinicalNote;
+          doc.text(clinicalNote, textX, textY);
         }
+
+        // AI Explanation area (right side)
+        const explanationX = margin + (contentWidth * 0.6);
+        let explanationY = y + 5;
+        
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(60, 60, 60);
+        doc.text('AI Analysis:', explanationX, explanationY);
+        explanationY += 5;
+
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(80, 80, 80);
+        const explanation = file.clinicianExplanation !== undefined 
+          ? file.clinicianExplanation 
+          : (file.aiExplanation || 'No explanation available');
+        
+        // Split explanation into multiple lines if needed
+        const maxWidth = (contentWidth * 0.35);
+        const explanationLines = doc.splitTextToSize(explanation, maxWidth);
+        doc.text(explanationLines.slice(0, 3), explanationX, explanationY); // Max 3 lines
+
+        y += 55; // Move to next file position
       }
+
+      y += 10; // Extra space between categories
     }
-    doc.save('epiprecision_report.pdf');
+
+    // Footer on last page
+    const totalPages = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(150, 150, 150);
+      doc.text(`EpiPrecision Medical Imaging Platform - Page ${i} of ${totalPages}`, margin, pageHeight - 10);
+      doc.text('Confidential Medical Report', pageWidth - margin - 40, pageHeight - 10);
+    }
+
+    // Save the PDF
+    doc.save('EpiPrecision_Analysis_Report.pdf');
   };
 
   // Helper to get image data URL from blob URL or static path
@@ -220,22 +339,23 @@ const ResultsPage = () => {
   return (
     <Container maxWidth="lg" sx={{ py: 2 }}>
       {/* Header Section */}
-      <Box sx={{
-        background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
+      <Box sx={{ 
+        background: '#1a1a1a',
+        border: '1px solid #333333',
         borderRadius: 3,
         p: 2,
         mb: 3,
-        color: 'white'
+        color: '#e0e0e0'
       }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-          <Avatar sx={{ bgcolor: 'white', color: 'primary.main', width: 48, height: 48 }}>
+          <Avatar sx={{ bgcolor: '#2a2a2a', color: '#e0e0e0', width: 48, height: 48 }}>
             <Assessment fontSize="large" />
           </Avatar>
           <Box>
-            <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5 }}>
+            <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5, color: '#e0e0e0' }}>
               Analysis Results
             </Typography>
-            <Typography variant="subtitle1" sx={{ opacity: 0.9 }}>
+            <Typography variant="subtitle1" sx={{ opacity: 0.9, color: '#e0e0e0' }}>
               AI-powered categorization complete
             </Typography>
           </Box>
@@ -243,15 +363,15 @@ const ResultsPage = () => {
         
         {processingComplete && (
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' }}>
-            <Typography variant="body1" sx={{ opacity: 0.9 }}>
+            <Typography variant="body1" sx={{ opacity: 0.9, color: '#e0e0e0' }}>
               {uploadedFiles.length} files processed and categorized
             </Typography>
             <Button 
               variant="contained" 
               sx={{ 
-                bgcolor: 'white', 
-                color: 'primary.main',
-                '&:hover': { bgcolor: 'rgba(255,255,255,0.9)' }
+                                  bgcolor: '#2a2a2a', 
+                  color: '#e0e0e0',
+                  '&:hover': { bgcolor: '#333333' }
               }}
               startIcon={<Download />}
               onClick={handleDownloadPDF}
@@ -267,13 +387,13 @@ const ResultsPage = () => {
           {/* Summary Stats */}
           <Paper sx={{ p: 2, mb: 3, borderRadius: 2 }}>
             <Typography variant="h6" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-              <FolderSpecial color="primary" />
+              <FolderSpecial sx={{ color: '#e0e0e0' }} />
               Processing Summary
             </Typography>
             <Grid container spacing={3}>
               <Grid item xs={12} md={4}>
                 <Box sx={{ textAlign: 'center' }}>
-                  <Typography variant="h3" color="primary" sx={{ fontWeight: 700 }}>
+                  <Typography variant="h3" sx={{ fontWeight: 700, color: '#e0e0e0' }}>
                     {uploadedFiles.length}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
@@ -298,7 +418,7 @@ const ResultsPage = () => {
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     Active Categories
-          </Typography>
+                  </Typography>
                 </Box>
               </Grid>
             </Grid>
@@ -377,9 +497,9 @@ const ResultsPage = () => {
       <Dialog 
         open={dialogOpen} 
         onClose={handleCloseDialog}
-        maxWidth="lg"
+        maxWidth="xl"
         fullWidth
-        PaperProps={{
+        PaperProps={{ 
           sx: { borderRadius: 2 }
         }}
       >
@@ -387,8 +507,9 @@ const ResultsPage = () => {
           display: 'flex', 
           alignItems: 'center', 
           justifyContent: 'space-between',
-          bgcolor: selectedFolder?.color,
-          borderBottom: `3px solid ${selectedFolder?.borderColor}`
+          bgcolor: '#1a1a1a',
+          borderBottom: `3px solid ${selectedFolder?.borderColor}`,
+          color: '#e0e0e0'
         }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Avatar sx={{ bgcolor: selectedFolder?.borderColor, color: 'white' }}>
@@ -413,20 +534,21 @@ const ResultsPage = () => {
           </IconButton>
         </DialogTitle>
         
-        <DialogContent sx={{
+        <DialogContent sx={{ 
           p: 2,
           mt: 1.5,
-          background: '#fff', // White background for dialog body
-          border: '3px solid #fff',
+          background: '#1a1a1a', // Dark background for dialog body
+          border: '3px solid #1a1a1a',
           borderTop: 0,
           borderRadius: '0 0 18px 18px',
-          boxShadow: '0 2px 12px 0 rgba(0,0,0,0.04)',
+          boxShadow: '0 2px 12px 0 rgba(0,0,0,0.6)',
         }}>
-          <Box sx={{
-            background: selectedFolder?.color,
+          <Box sx={{ 
+            background: '#1a1a1a',
             borderRadius: 3,
             p: 2,
             minHeight: 180,
+            border: `2px solid ${selectedFolder?.borderColor}`,
           }}>
             {selectedFolder && selectedFolder.files && selectedFolder.files.length > 0 ? (
               <Grid container spacing={2}>
@@ -437,180 +559,207 @@ const ResultsPage = () => {
                       <Paper 
                         sx={{ 
                           p: 3,
-                          border: `1px solid ${selectedFolder.borderColor}`,
+                          border: `2px solid ${selectedFolder.borderColor}`,
                           borderRadius: 2,
-                          bgcolor: selectedFolder.color
+                          bgcolor: '#1a1a1a',
+                          color: selectedFolder.borderColor,
                         }}
                       >
                         <Grid container spacing={3} alignItems="flex-start">
-                                                   {/* Images Section */}
-                           <Grid item xs={12} md={3}>
-                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-                               <Box>
-                                 <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: 'block', fontWeight: 600 }}>
-                                   Original Image
-                                 </Typography>
-                                 {imagePreview ? (
-                                   <Box
-                                     component="img"
-                                     src={imagePreview}
-                                     alt={file.name}
-                                     sx={{
-                                       width: '100%',
-                                       height: 100,
-                                       objectFit: 'cover',
-                                       borderRadius: 2,
-                                       border: '2px solid #ddd',
-                                       cursor: 'pointer',
-                                       transition: 'all 0.2s ease',
-                                       '&:hover': { 
-                                         opacity: 0.8,
-                                         transform: 'scale(1.02)',
-                                         borderColor: '#1976d2'
-                                       }
-                                     }}
-                                     onClick={() => setImagePreviewUrl(imagePreview)}
-                                   />
-                                 ) : (
-                                   <Box
-                                     sx={{
-                                       width: '100%',
-                                       height: 100,
-                                       display: 'flex',
-                                       alignItems: 'center',
-                                       justifyContent: 'center',
-                                       bgcolor: '#f5f5f5',
-                                       borderRadius: 2,
-                                       border: '2px solid #ddd'
-                                     }}
-                                   >
-                                     <InsertDriveFile color="action" sx={{ fontSize: '2rem' }} />
-                                   </Box>
-                                 )}
-                               </Box>
-                               
-                               {file.aiHeatmap && (
-                                 <Box>
-                                   <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: 'block', fontWeight: 600 }}>
-                                     AI Heatmap
-                                   </Typography>
-                                   <Box
-                                     component="img"
-                                     src={file.aiHeatmap}
-                                     alt="AI Heatmap"
-                                     sx={{
-                                       width: '100%',
-                                       height: 80,
-                                       objectFit: 'cover',
-                                       borderRadius: 2,
-                                       border: '2px solid #ddd',
-                                       cursor: 'pointer',
-                                       transition: 'all 0.2s ease',
-                                       '&:hover': { 
-                                         opacity: 0.8,
-                                         transform: 'scale(1.02)',
-                                         borderColor: '#1976d2'
-                                       }
-                                     }}
-                                     onClick={() => setImagePreviewUrl(file.aiHeatmap)}
-                                   />
-                                 </Box>
-                               )}
-                             </Box>
-                           </Grid>
+                          {/* Header Section */}
+                          <Grid item xs={12}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <Box>
+                                <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                                  {file.name}
+                                </Typography>
+                                <Chip 
+                                  label={selectedFolder.name}
+                                  color={selectedFolder.badgeColor}
+                                  size="small"
+                                />
+                              </Box>
+                              
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                <Select
+                                  value={file && typeof file.clinicianApproval === 'string' ? file.clinicianApproval : ''}
+                                  onChange={e => handleApprovalChange(selectedFolder.id, file.id, e.target.value)}
+                                  displayEmpty
+                                  size="small"
+                                  sx={{ 
+                                    minWidth: 140, 
+                                    borderRadius: 1,
+                                    bgcolor: file?.clinicianApproval === 'approved' ? '#e8f5e9' : 
+                                            file?.clinicianApproval === 'disapproved' ? '#ffebee' : 'white',
+                                    color: file?.clinicianApproval === 'approved' ? '#2e7d32' : 
+                                           file?.clinicianApproval === 'disapproved' ? '#d32f2f' : 'inherit',
+                                    fontWeight: file?.clinicianApproval ? 600 : 'normal'
+                                  }}
+                                >
+                                  <MenuItem value=""><em>Pending Review</em></MenuItem>
+                                  <MenuItem value="approved">
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                      <CheckCircleOutline sx={{ color: 'green' }} />
+                                      Approved
+                                    </Box>
+                                  </MenuItem>
+                                  <MenuItem value="disapproved">
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                      <HighlightOff sx={{ color: 'red' }} />
+                                      Disapproved
+                                    </Box>
+                                  </MenuItem>
+                                </Select>
+                              </Box>
+                            </Box>
+                          </Grid>
 
-                           {/* File Info Section */}
-                           <Grid item xs={12} md={9}>
-                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-                               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                 <Box>
-                                   <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                                     {file.name}
-                                   </Typography>
-                                   <Chip 
-                                     label={selectedFolder.name}
-                                     color={selectedFolder.badgeColor}
-                                     size="small"
-                                   />
-                                 </Box>
-                                 
-                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                   <Select
-                                     value={file && typeof file.clinicianApproval === 'string' ? file.clinicianApproval : ''}
-                                     onChange={e => handleApprovalChange(selectedFolder.id, file.id, e.target.value)}
-                                     displayEmpty
-                                     size="small"
-                                     sx={{ 
-                                       minWidth: 140, 
-                                       borderRadius: 1,
-                                       bgcolor: file?.clinicianApproval === 'approved' ? '#e8f5e9' : 
-                                               file?.clinicianApproval === 'disapproved' ? '#ffebee' : 'white',
-                                       color: file?.clinicianApproval === 'approved' ? '#2e7d32' : 
-                                              file?.clinicianApproval === 'disapproved' ? '#d32f2f' : 'inherit',
-                                       fontWeight: file?.clinicianApproval ? 600 : 'normal'
-                                     }}
-                                   >
-                                     <MenuItem value=""><em>Pending Review</em></MenuItem>
-                                     <MenuItem value="approved">
-                                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                         <CheckCircleOutline sx={{ color: 'green' }} />
-                                         Approved
-                                       </Box>
-                                     </MenuItem>
-                                     <MenuItem value="disapproved">
-                                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                         <HighlightOff sx={{ color: 'red' }} />
-                                         Disapproved
-                                       </Box>
-                                     </MenuItem>
-                                   </Select>
-                                 </Box>
-                               </Box>
+                          {/* Images Section */}
+                          <Grid item xs={12}>
+                            <Grid container spacing={2}>
+                              <Grid item xs={12} md={6}>
+                                <Box>
+                                  <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: 'block', fontWeight: 600 }}>
+                                    Original Image
+                                  </Typography>
+                                  {imagePreview ? (
+                                    <Box
+                                      component="img"
+                                      src={imagePreview}
+                                      alt={file.name}
+                                      sx={{ 
+                                        width: '100%',
+                                        height: 300,
+                                        objectFit: 'contain',
+                                        borderRadius: 2,
+                                        border: '2px solid #444444',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s ease',
+                                        '&:hover': { 
+                                          opacity: 0.8,
+                                          transform: 'scale(1.02)',
+                                          borderColor: '#4fc3f7'
+                                        }
+                                      }}
+                                      onClick={() => setImagePreviewUrl(imagePreview)}
+                                    />
+                                  ) : (
+                                    <Box
+                                      sx={{ 
+                                        width: '100%',
+                                        height: 300,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        bgcolor: '#f5f5f5',
+                                        borderRadius: 2,
+                                        border: '2px solid #ddd'
+                                      }}
+                                    >
+                                      <InsertDriveFile color="action" sx={{ fontSize: '2rem' }} />
+                                    </Box>
+                                  )}
+                                </Box>
+                              </Grid>
+                              {file.aiHeatmap && (
+                                <Grid item xs={12} md={6}>
+                                  <Box>
+                                    <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: 'block', fontWeight: 600 }}>
+                                      AI Heatmap
+                                    </Typography>
+                                    <Box
+                                      component="img"
+                                      src={file.aiHeatmap}
+                                      alt="AI Heatmap"
+                                      sx={{ 
+                                        width: '100%',
+                                        height: 300,
+                                        objectFit: 'contain',
+                                        borderRadius: 2,
+                                        border: '2px solid #444444',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.2s ease',
+                                        '&:hover': { 
+                                          opacity: 0.8,
+                                          transform: 'scale(1.02)',
+                                          borderColor: '#4fc3f7'
+                                        }
+                                      }}
+                                      onClick={() => setImagePreviewUrl(file.aiHeatmap)}
+                                    />
+                                  </Box>
+                                </Grid>
+                              )}
+                            </Grid>
+                          </Grid>
 
-                               <Box sx={{ display: 'flex', gap: 2 }}>
-                                 <Box sx={{ flex: 3 }}>
-                                   <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1, fontWeight: 600 }}>
-                                     AI Explanation
-                                   </Typography>
-                                   <Box
-                                     component="textarea"
-                                     value={file.clinicianExplanation !== undefined ? file.clinicianExplanation : (file.aiExplanation || 'No explanation available')}
-                                     onChange={e => handleExplanationChange(selectedFolder.id, file.id, e.target.value)}
-                                     style={{
-                                       width: '100%',
-                                       height: '70px',
-                                       padding: '10px',
-                                       borderRadius: '8px',
-                                       border: '1px solid #e0e0e0',
-                                       fontSize: '0.95rem',
-                                       fontFamily: 'inherit',
-                                       resize: 'vertical',
-                                       backgroundColor: '#fafafa'
-                                     }}
-                                   />
-                                 </Box>
-
-                                 <Box sx={{ flex: 2 }}>
-                                   <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1, fontWeight: 600 }}>
-                                     Clinical Note
-                                   </Typography>
-                                   {file && file.clinicalNote ? (
-                                     <Paper sx={{ p: 2, bgcolor: 'info.light', color: 'info.contrastText', height: '70px', overflow: 'auto', borderRadius: 2 }}>
-                                       <Typography variant="body2" sx={{ fontSize: '0.9rem', lineHeight: 1.4 }}>
-                                         {file.clinicalNote}
-                                       </Typography>
-                                     </Paper>
-                                   ) : (
-                                     <Paper sx={{ p: 2, bgcolor: 'grey.100', height: '70px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 2 }}>
-                                       <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
-                                         No clinical note provided
-                                       </Typography>
-                                     </Paper>
-                                   )}
-                                 </Box>
-                               </Box>
-                             </Box>
-                           </Grid>
+                          {/* Explanations Section */}
+                          <Grid item xs={12}>
+                            <Grid container spacing={2}>
+                              <Grid item xs={12} md={6}>
+                                <Box>
+                                  <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1, fontWeight: 600 }}>
+                                    AI Explanation
+                                  </Typography>
+                                  <Box
+                                    component="textarea"
+                                    value={file.clinicianExplanation !== undefined ? file.clinicianExplanation : (file.aiExplanation || 'No explanation available')}
+                                    onChange={e => handleExplanationChange(selectedFolder.id, file.id, e.target.value)}
+                                    style={{ 
+                                      width: '100%',
+                                      height: '80px',
+                                      padding: '10px',
+                                      borderRadius: '8px',
+                                      border: '1px solid #444444',
+                                      fontSize: '0.95rem',
+                                      fontFamily: 'inherit',
+                                      resize: 'vertical',
+                                      backgroundColor: '#1a1a1a',
+                                      color: '#e0e0e0'
+                                    }}
+                                  />
+                                </Box>
+                              </Grid>
+                              <Grid item xs={12} md={6}>
+                                <Box>
+                                  <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1, fontWeight: 600 }}>
+                                    Clinical Note
+                                  </Typography>
+                                  {file && file.clinicalNote ? (
+                                    <Paper sx={{ 
+                                      p: 2, 
+                                      bgcolor: '#2a2a2a', 
+                                      color: '#e0e0e0', 
+                                      height: '80px', 
+                                      overflow: 'auto', 
+                                      borderRadius: 2,
+                                      border: '1px solid #444444',
+                                      boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.3)'
+                                    }}>
+                                      <Typography variant="body2" sx={{ fontSize: '0.9rem', lineHeight: 1.4, color: '#e0e0e0' }}>
+                                        {file.clinicalNote}
+                                      </Typography>
+                                    </Paper>
+                                  ) :
+                                    <Paper sx={{ 
+                                      p: 2, 
+                                      bgcolor: '#2a2a2a', 
+                                      height: '80px', 
+                                      display: 'flex', 
+                                      alignItems: 'center', 
+                                      justifyContent: 'center', 
+                                      borderRadius: 2,
+                                      border: '1px solid #444444'
+                                    }}>
+                                      <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                                        No clinical note provided
+                                      </Typography>
+                                    </Paper>
+                                  }
+                                </Box>
+                              </Grid>
+                            </Grid>
+                          </Grid>
                         </Grid>
                       </Paper>
                     </Grid>
@@ -618,33 +767,14 @@ const ResultsPage = () => {
                 })}
               </Grid>
             ) : (
-              <Box sx={{ textAlign: 'center', py: 6 }}>
-                <Avatar sx={{ 
-                  width: 80, 
-                  height: 80, 
-                  bgcolor: 'grey.100', 
-                  color: 'grey.400',
-                  mx: 'auto',
-                  mb: 2
-                }}>
-                  <Folder sx={{ fontSize: '3rem' }} />
-                </Avatar>
-                <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
-                  No Files Found
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  No files were classified into this category during analysis
+              <Box sx={{ textAlign: 'center', py: 4, color: 'text.secondary' }}>
+                <Typography variant="h6">
+                  No files in this category
                 </Typography>
               </Box>
             )}
-    </Box>
+          </Box>
         </DialogContent>
-        
-        <DialogActions sx={{ p: 2, bgcolor: 'grey.50' }}>
-          <Button onClick={handleCloseDialog} variant="contained" size="large">
-            Close
-          </Button>
-        </DialogActions>
       </Dialog>
 
       {/* Image Lightbox Dialog */}

@@ -5,13 +5,100 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #0a0a0a;
+  color: #e0e0e0;
+  overflow-x: hidden;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+  background-color: #1a1a1a;
+  color: #e0e0e0;
+  padding: 2px 4px;
+  border-radius: 4px;
 }
 
 * {
   box-sizing: border-box;
+}
+
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333333;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #444444;
+}
+
+::-webkit-scrollbar-corner {
+  background: #0a0a0a;
+}
+
+/* Firefox scrollbar */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #333333 #0a0a0a;
+}
+
+/* Selection styling for dark theme */
+::selection {
+  background-color: #00ffff;
+  color: #000000;
+}
+
+::-moz-selection {
+  background-color: #00ffff;
+  color: #000000;
+}
+
+/* Focus outline for accessibility */
+*:focus {
+  outline: 2px solid #00ffff;
+  outline-offset: 2px;
+}
+
+/* Remove focus outline for mouse users */
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Ensure proper contrast for links */
+a {
+  color: #4fc3f7;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #81d4fa;
+  text-decoration: underline;
+}
+
+/* Dark theme for any remaining elements */
+input, textarea, select {
+  background-color: #1a1a1a;
+  color: #e0e0e0;
+  border: 1px solid #444444;
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: #4fc3f7;
+}
+
+/* Ensure proper styling for any tooltips or popovers */
+.MuiTooltip-tooltip {
+  background-color: #1a1a1a !important;
+  color: #e0e0e0 !important;
+  border: 1px solid #333333 !important;
 } 

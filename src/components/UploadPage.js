@@ -216,7 +216,7 @@ const UploadPage = () => {
         </Grid>
 
         {/* Main Upload Section */}
-        <Grid item xs={12} md={8}>
+        <Grid item xs={12} md={9}>
           <Card sx={{ height: 'fit-content' }}>
             <CardContent sx={{ p: 4 }}>
               {/* Existing Files Display */}
@@ -242,10 +242,10 @@ const UploadPage = () => {
                     Total size: {getTotalFileSize(uploadedFiles)} MB
                   </Typography>
                   {/* Clinical context input for each file */}
-                  <List dense sx={{ mt: 2 }}>
+                  <List dense sx={{ mt: 2, width: '100%' }}>
                     {uploadedFiles.map((file, idx) => (
-                      <ListItem key={file.id} alignItems="flex-start" sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', mb: 1 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', gap: 2 }}>
+                      <ListItem key={file.id} alignItems="flex-start" sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', mb: 2, width: '100%' }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', gap: 2, mb: 1 }}>
                           {getFileIcon(file)}
                           <Box sx={{ flexGrow: 1 }}>
                             <Typography variant="body2" sx={{ fontWeight: 500 }}>
@@ -256,7 +256,7 @@ const UploadPage = () => {
                             </Typography>
                           </Box>
                         </Box>
-                        <Box sx={{ width: '100%', mt: 1 }}>
+                        <Box sx={{ width: '100%', mt: 1, minWidth: '100%' }}>
                           <input
                             type="text"
                             placeholder="Add clinical context (optional)"
@@ -264,17 +264,26 @@ const UploadPage = () => {
                             onChange={e => handleNoteChange(file.id, e.target.value)}
                             style={{
                               width: '100%',
-                              padding: '8px',
-                              borderRadius: '6px',
-                              border: '1px solid #888888',
-                              fontSize: '0.95rem',
-                              marginTop: 2,
+                              padding: '12px 16px',
+                              borderRadius: '8px',
+                              border: '2px solid #444444',
+                              fontSize: '1rem',
+                              marginTop: 4,
                               backgroundColor: '#1a1a1a',
                               color: '#e0e0e0',
                               outline: 'none',
+                              minHeight: '48px',
+                              boxSizing: 'border-box',
+                              transition: 'all 0.2s ease-in-out',
                             }}
-                            onFocus={e => e.target.style.border = '2px solid #00ffff'}
-                            onBlur={e => e.target.style.border = '1px solid #888888'}
+                            onFocus={e => {
+                              e.target.style.border = '2px solid #00ffff';
+                              e.target.style.boxShadow = '0 0 8px 2px #00ffff44';
+                            }}
+                            onBlur={e => {
+                              e.target.style.border = '2px solid #444444';
+                              e.target.style.boxShadow = 'none';
+                            }}
                           />
                         </Box>
                       </ListItem>
@@ -501,7 +510,7 @@ const UploadPage = () => {
         </Grid>
 
         {/* Information Panel */}
-        <Grid item xs={12} md={4}>
+        <Grid item xs={12} md={3}>
           <Card sx={{ height: 'fit-content', mb: 3 }}>
             <CardContent sx={{ p: 3 }}>
               <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>

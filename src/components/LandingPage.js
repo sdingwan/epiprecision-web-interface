@@ -234,7 +234,7 @@ const LandingPage = () => {
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: '#0a0a0a', display: 'flex', flexDirection: 'column', alignItems: 'center', py: 6 }}>
       {/* User Welcome Section */}
-      <Box sx={{ width: '100%', maxWidth: 800, mb: 4 }}>
+      <Box sx={{ width: '100%', maxWidth: 1000, mb: 4 }}>
         <Card sx={{ background: '#1a1a1a', color: '#e0e0e0', borderRadius: 3, boxShadow: 4, border: '1px solid #333333' }}>
           <CardContent sx={{ p: 3 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 2 }}>
@@ -281,7 +281,7 @@ const LandingPage = () => {
       </Box>
 
       {/* Main Analysis Section - Centered, wide, and with whitespace */}
-      <Box sx={{ width: '100%', maxWidth: 800, mx: 'auto' }}>
+      <Box sx={{ width: '100%', maxWidth: 1000, mx: 'auto' }}>
         <Card sx={{ width: '100%', p: 3, boxShadow: 6, borderRadius: 4, bgcolor: '#1a1a1a' }}>
           <CardContent sx={{ p: { xs: 2, md: 4 } }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -305,6 +305,8 @@ const LandingPage = () => {
               onChange={e => setDataType(e.target.value)}
               sx={{ mb: 2 }}
             >
+              <Grid container spacing={2}>
+                <Grid item xs={12}>
               <Paper 
                 className={dataType === 'MRI' ? 'neon-selected' : ''}
                 sx={{ 
@@ -333,64 +335,68 @@ const LandingPage = () => {
                   }
                 />
               </Paper>
-              
-              <Paper 
-                className={dataType === 'EEG' ? 'neon-selected' : ''}
-                sx={{ 
-                  p: 1.5, 
-                  mb: 1.5, 
-                  border: dataType === 'EEG' ? '2px solid #00ffff' : '1px solid #333333',
-                  borderRadius: 2,
-                  bgcolor: dataType === 'EEG' ? '#2a2a2a' : 'transparent',
-                  color: dataType === 'EEG' ? '#00ffff' : '#e0e0e0',
-                  boxShadow: dataType === 'EEG' ? '0 0 8px 2px #00ffff55' : 'none',
-                  transition: 'border-color 0.2s, box-shadow 0.2s, color 0.2s',
-                }}
-              >
-                <FormControlLabel 
-                  value="EEG" 
-                  control={<Radio />} 
-                  label={
-                    <Box>
-                      <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                        EEG (Electroencephalography)
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        Electrical activity monitoring for seizure detection
-                      </Typography>
-                    </Box>
-                  }
-                />
-              </Paper>
-              
-              <Paper 
-                className={dataType === 'PET' ? 'neon-selected' : ''}
-                sx={{ 
-                  p: 1.5, 
-                  mb: 1.5, 
-                  border: dataType === 'PET' ? '2px solid #00ffff' : '1px solid #333333',
-                  borderRadius: 2,
-                  bgcolor: dataType === 'PET' ? '#2a2a2a' : 'transparent',
-                  color: dataType === 'PET' ? '#00ffff' : '#e0e0e0',
-                  boxShadow: dataType === 'PET' ? '0 0 8px 2px #00ffff55' : 'none',
-                  transition: 'border-color 0.2s, box-shadow 0.2s, color 0.2s',
-                }}
-              >
-                <FormControlLabel 
-                  value="PET" 
-                  control={<Radio />} 
-                  label={
-                    <Box>
-                      <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                        PET (Positron Emission Tomography)
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        Metabolic brain imaging for functional analysis
-                      </Typography>
-                    </Box>
-                  }
-                />
-              </Paper>
+                </Grid>
+                <Grid item xs={12}>
+                  <Paper 
+                    className={dataType === 'EEG' ? 'neon-selected' : ''}
+                    sx={{ 
+                      p: 1.5, 
+                      mb: 1.5, 
+                      border: dataType === 'EEG' ? '2px solid #00ffff' : '1px solid #333333',
+                      borderRadius: 2,
+                      bgcolor: dataType === 'EEG' ? '#2a2a2a' : 'transparent',
+                      color: dataType === 'EEG' ? '#00ffff' : '#e0e0e0',
+                      boxShadow: dataType === 'EEG' ? '0 0 8px 2px #00ffff55' : 'none',
+                      transition: 'border-color 0.2s, box-shadow 0.2s, color 0.2s',
+                    }}
+                  >
+                    <FormControlLabel 
+                      value="EEG" 
+                      control={<Radio />} 
+                      label={
+                        <Box>
+                          <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                            EEG (Electroencephalography)
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            Electrical activity monitoring for seizure detection
+                          </Typography>
+                        </Box>
+                      }
+                    />
+                  </Paper>
+                </Grid>
+                <Grid item xs={12}>
+                  <Paper 
+                    className={dataType === 'PET' ? 'neon-selected' : ''}
+                    sx={{ 
+                      p: 1.5, 
+                      mb: 1.5, 
+                      border: dataType === 'PET' ? '2px solid #00ffff' : '1px solid #333333',
+                      borderRadius: 2,
+                      bgcolor: dataType === 'PET' ? '#2a2a2a' : 'transparent',
+                      color: dataType === 'PET' ? '#00ffff' : '#e0e0e0',
+                      boxShadow: dataType === 'PET' ? '0 0 8px 2px #00ffff55' : 'none',
+                      transition: 'border-color 0.2s, box-shadow 0.2s, color 0.2s',
+                    }}
+                  >
+                    <FormControlLabel 
+                      value="PET" 
+                      control={<Radio />} 
+                      label={
+                        <Box>
+                          <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                            PET (Positron Emission Tomography)
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            Metabolic brain imaging for functional analysis
+                          </Typography>
+                        </Box>
+                      }
+                    />
+                  </Paper>
+                </Grid>
+              </Grid>
             </RadioGroup>
 
             <Button

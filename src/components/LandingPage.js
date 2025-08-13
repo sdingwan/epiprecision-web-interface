@@ -83,129 +83,147 @@ const LandingPage = () => {
   };
 
   if (!userInfo) {
-    // User not logged in - show professional login prompt
+    // User not logged in - show professional login prompt (dark themed)
     return (
       <Box 
         sx={{ 
           minHeight: '100vh',
-          background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+          bgcolor: '#0a0a0a',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          p: { xs: 1, md: 2 }
+          py: { xs: 2, md: 4 },
+          px: { xs: 2, md: 4 }
         }}
       >
-        <Grid container maxWidth="lg" spacing={2} alignItems="center">
+        <Box
+          sx={{
+            width: '100%',
+            maxWidth: 1500,
+            mx: 'auto',
+            px: { xs: 1, md: 2 },
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', md: '1fr 540px' },
+            columnGap: { xs: 3, md: 6 },
+            rowGap: { xs: 4, md: 0 },
+            alignItems: 'center',
+            justifyContent: 'center',
+            justifyItems: { xs: 'stretch', md: 'center' }
+          }}
+        >
           {/* Left side - Branding and Info */}
-          <Grid item xs={12} md={6}>
+          <Box>
             <Box sx={{ textAlign: { xs: 'center', md: 'left' } }}>
-              <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, justifyContent: { xs: 'center', md: 'flex-start' } }}>
-                <Biotech sx={{ fontSize: '2.2rem', color: '#e0e0e0', mr: 1.5 }} />
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 4, justifyContent: { xs: 'center', md: 'flex-start' } }}>
+                <Biotech sx={{ fontSize: '3.2rem', color: '#00ffff', mr: 2.2 }} />
                 <Box>
-                                      <Typography variant="h4" sx={{ fontWeight: 700, color: '#e0e0e0' }}>
+                  <Typography variant="h2" sx={{ fontWeight: 800, color: '#e0e0e0', letterSpacing: 0.5 }}>
                     EpiPrecision
                   </Typography>
-                  <Typography variant="body1" color="text.secondary" sx={{ fontWeight: 500 }}>
+                  <Typography variant="subtitle1" color="text.secondary" sx={{ fontWeight: 600 }}>
                     Advanced Medical Imaging Platform
                   </Typography>
                 </Box>
               </Box>
-              
-              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600, color: 'text.primary' }}>
+
+              <Typography variant="h4" sx={{ mb: 3, fontWeight: 800, color: '#e0e0e0' }}>
                 Precision Epilepsy Analysis Through AI-Powered Neuroimaging
               </Typography>
-              
-              <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary', lineHeight: 1.5 }}>
+
+              <Typography variant="body1" sx={{ mb: 4, color: 'text.secondary', lineHeight: 1.8, maxWidth: 900 }}>
                 State-of-the-art independent component analysis for identifying seizure onset zones 
                 with clinical-grade accuracy and reliability.
               </Typography>
 
               {/* Feature highlights */}
-              <Grid container spacing={1} sx={{ mb: 2 }}>
+              <Grid container spacing={1.5} sx={{ mb: 3 }}>
                 <Grid item xs={12} sm={6}>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    <CheckCircle sx={{ color: 'success.main', mr: 1, fontSize: '1rem' }} />
-                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                    <CheckCircle sx={{ color: 'success.main', mr: 1.2, fontSize: '1.1rem' }} />
+                    <Typography variant="body1" sx={{ fontWeight: 600 }}>
                       FDA-Compliant Processing
                     </Typography>
                   </Box>
                 </Grid>
                                  <Grid item xs={12} sm={6}>
                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                     <Security sx={{ color: 'success.main', mr: 1, fontSize: '1rem' }} />
-                     <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                     <Security sx={{ color: 'success.main', mr: 1.2, fontSize: '1.1rem' }} />
+                     <Typography variant="body1" sx={{ fontWeight: 600 }}>
                        Secure Platform
                      </Typography>
                    </Box>
                  </Grid>
                 <Grid item xs={12} sm={6}>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    <Psychology sx={{ color: 'success.main', mr: 1, fontSize: '1rem' }} />
-                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                    <Psychology sx={{ color: 'success.main', mr: 1.2, fontSize: '1.1rem' }} />
+                    <Typography variant="body1" sx={{ fontWeight: 600 }}>
                       AI-Powered Analysis
                     </Typography>
                   </Box>
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    <Assessment sx={{ color: 'success.main', mr: 1, fontSize: '1rem' }} />
-                    <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                    <Assessment sx={{ color: 'success.main', mr: 1.2, fontSize: '1.1rem' }} />
+                    <Typography variant="body1" sx={{ fontWeight: 600 }}>
                       Clinical Integration
                     </Typography>
                   </Box>
                 </Grid>
               </Grid>
+
+              <Divider sx={{ borderColor: '#333333', my: 2 }} />
+              <Typography variant="caption" color="text.secondary">
+                Trusted by clinicians and researchers for secure, compliant neuroimaging analysis
+              </Typography>
             </Box>
-          </Grid>
+          </Box>
           
           {/* Right side - Login Card */}
-          <Grid item xs={12} md={6}>
+          <Box>
             <Paper 
               elevation={0}
               sx={{ 
-                p: 2.5, 
+                p: 4, 
                 borderRadius: 3,
-                background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
-                border: '1px solid #e2e8f0',
-                boxShadow: '0 4px 12px 0 rgba(0, 0, 0, 0.08)'
+                background: '#1a1a1a',
+                border: '1px solid #333333',
+                boxShadow: '0 6px 20px rgba(0, 0, 0, 0.5)'
               }}
             >
               <Box sx={{ textAlign: 'center', mb: 4 }}>
                 <Avatar 
                   sx={{ 
-                    width: 48, 
-                    height: 48, 
+                    width: 56, 
+                    height: 56, 
                     bgcolor: '#2a2a2a', 
+                    color: '#e0e0e0',
                     mx: 'auto', 
                     mb: 1.5,
-                    boxShadow: '0 2px 6px 0 rgba(25, 118, 210, 0.18)'
+                    boxShadow: '0 2px 6px rgba(0, 0, 0, 0.6)'
                   }}
                 >
                   <LocalHospital sx={{ fontSize: '1.5rem' }} />
                 </Avatar>
-                <Typography variant="h6" sx={{ fontWeight: 600, mb: 0.5 }}>
+                <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5, color: '#e0e0e0' }}>
                   Secure Access Portal
                 </Typography>
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="body2" color="text.secondary">
                   Sign in to access advanced neuroimaging analysis tools
                 </Typography>
               </Box>
 
               <Button
-                variant="contained"
-                size="medium"
+                variant="outlined"
+                size="large"
                 fullWidth
                 onClick={() => navigate('/login')}
                 startIcon={<Person />}
                 sx={{ 
-                  py: 1,
-                  fontSize: '0.95rem',
-                  fontWeight: 600,
+                  py: 1.5,
+                  fontSize: '1.05rem',
+                  fontWeight: 700,
                   borderRadius: 2,
-                  boxShadow: '0 2px 6px 0 rgba(25, 118, 210, 0.18)',
-                  '&:hover': {
-                    boxShadow: '0 4px 12px 0 rgba(25, 118, 210, 0.22)',
-                  }
+                  boxShadow: '0 0 8px 2px #00ffff55',
                 }}
               >
                 Sign In / Create Account
@@ -217,15 +235,15 @@ const LandingPage = () => {
                 </Typography>
               </Divider>
 
-              <Box sx={{ textAlign: 'center' }}>
-                <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.3 }}>
+              <Box sx={{ textAlign: 'center', mt: 3 }}>
+                <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.5 }}>
                   This platform complies with FDA guidelines and medical data protection standards. 
                   Your patient data is encrypted and secure.
                 </Typography>
               </Box>
             </Paper>
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
       </Box>
     );
   }
@@ -337,64 +355,64 @@ const LandingPage = () => {
               </Paper>
                 </Grid>
                 <Grid item xs={12}>
-                  <Paper 
-                    className={dataType === 'EEG' ? 'neon-selected' : ''}
-                    sx={{ 
-                      p: 1.5, 
-                      mb: 1.5, 
-                      border: dataType === 'EEG' ? '2px solid #00ffff' : '1px solid #333333',
-                      borderRadius: 2,
-                      bgcolor: dataType === 'EEG' ? '#2a2a2a' : 'transparent',
-                      color: dataType === 'EEG' ? '#00ffff' : '#e0e0e0',
-                      boxShadow: dataType === 'EEG' ? '0 0 8px 2px #00ffff55' : 'none',
-                      transition: 'border-color 0.2s, box-shadow 0.2s, color 0.2s',
-                    }}
-                  >
-                    <FormControlLabel 
-                      value="EEG" 
-                      control={<Radio />} 
-                      label={
-                        <Box>
-                          <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                            EEG (Electroencephalography)
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            Electrical activity monitoring for seizure detection
-                          </Typography>
-                        </Box>
-                      }
-                    />
-                  </Paper>
+              <Paper 
+                className={dataType === 'EEG' ? 'neon-selected' : ''}
+                sx={{ 
+                  p: 1.5, 
+                  mb: 1.5, 
+                  border: dataType === 'EEG' ? '2px solid #00ffff' : '1px solid #333333',
+                  borderRadius: 2,
+                  bgcolor: dataType === 'EEG' ? '#2a2a2a' : 'transparent',
+                  color: dataType === 'EEG' ? '#00ffff' : '#e0e0e0',
+                  boxShadow: dataType === 'EEG' ? '0 0 8px 2px #00ffff55' : 'none',
+                  transition: 'border-color 0.2s, box-shadow 0.2s, color 0.2s',
+                }}
+              >
+                <FormControlLabel 
+                  value="EEG" 
+                  control={<Radio />} 
+                  label={
+                    <Box>
+                      <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                        EEG (Electroencephalography)
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Electrical activity monitoring for seizure detection
+                      </Typography>
+                    </Box>
+                  }
+                />
+              </Paper>
                 </Grid>
                 <Grid item xs={12}>
-                  <Paper 
-                    className={dataType === 'PET' ? 'neon-selected' : ''}
-                    sx={{ 
-                      p: 1.5, 
-                      mb: 1.5, 
-                      border: dataType === 'PET' ? '2px solid #00ffff' : '1px solid #333333',
-                      borderRadius: 2,
-                      bgcolor: dataType === 'PET' ? '#2a2a2a' : 'transparent',
-                      color: dataType === 'PET' ? '#00ffff' : '#e0e0e0',
-                      boxShadow: dataType === 'PET' ? '0 0 8px 2px #00ffff55' : 'none',
-                      transition: 'border-color 0.2s, box-shadow 0.2s, color 0.2s',
-                    }}
-                  >
-                    <FormControlLabel 
-                      value="PET" 
-                      control={<Radio />} 
-                      label={
-                        <Box>
-                          <Typography variant="body1" sx={{ fontWeight: 600 }}>
-                            PET (Positron Emission Tomography)
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            Metabolic brain imaging for functional analysis
-                          </Typography>
-                        </Box>
-                      }
-                    />
-                  </Paper>
+              <Paper 
+                className={dataType === 'PET' ? 'neon-selected' : ''}
+                sx={{ 
+                  p: 1.5, 
+                  mb: 1.5, 
+                  border: dataType === 'PET' ? '2px solid #00ffff' : '1px solid #333333',
+                  borderRadius: 2,
+                  bgcolor: dataType === 'PET' ? '#2a2a2a' : 'transparent',
+                  color: dataType === 'PET' ? '#00ffff' : '#e0e0e0',
+                  boxShadow: dataType === 'PET' ? '0 0 8px 2px #00ffff55' : 'none',
+                  transition: 'border-color 0.2s, box-shadow 0.2s, color 0.2s',
+                }}
+              >
+                <FormControlLabel 
+                  value="PET" 
+                  control={<Radio />} 
+                  label={
+                    <Box>
+                      <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                        PET (Positron Emission Tomography)
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Metabolic brain imaging for functional analysis
+                      </Typography>
+                    </Box>
+                  }
+                />
+              </Paper>
                 </Grid>
               </Grid>
             </RadioGroup>

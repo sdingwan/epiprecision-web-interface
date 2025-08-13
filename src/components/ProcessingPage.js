@@ -133,10 +133,10 @@ const ProcessingPage = () => {
           </Avatar>
           <Box>
             <Typography variant="h5" sx={{ fontWeight: 700, color: '#e0e0e0' }}>
-              Data Processing
+              {steps[activeStep].label}
             </Typography>
             <Typography variant="body2" sx={{ color: 'rgba(224,224,224,0.9)' }}>
-              Step-by-step workflow for AI-powered analysis
+              AI-powered Workflow
             </Typography>
           </Box>
         </Box>
@@ -157,6 +157,7 @@ const ProcessingPage = () => {
                 <StepLabel 
                   icon={step.icon}
                   sx={{
+                    color: activeStep >= idx ? '#00ffff' : '#b0b0b0', // icon and label cyan
                     '& .MuiStepLabel-label': {
                       color: activeStep >= idx ? '#00ffff' : '#b0b0b0',
                       fontWeight: activeStep >= idx ? 600 : 400,

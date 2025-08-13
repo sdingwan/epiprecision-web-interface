@@ -107,10 +107,10 @@ const UploadPage = () => {
     }
   };
 
-  const getFileCountMessage = () => {
-    if (files.length === 0) return `No new files selected`;
-    if (files.length === 1) return `1 new file selected`;
-    return `${files.length} new files selected`;
+  const getFileCountMessage = (fileList) => {
+    if (fileList.length === 0) return `No new files selected`;
+    if (fileList.length === 1) return `1 new file selected`;
+    return `${fileList.length} new files selected`;
   };
 
   const getTotalFileSize = (fileList) => {
@@ -228,7 +228,7 @@ const UploadPage = () => {
                     <Button 
                       color="inherit" 
                       size="small" 
-                      onClick={clearFiles}
+                      onClick={() => { clearFiles(); setFiles([]); }}
                       startIcon={<Delete />}
                     >
                       Clear All
@@ -263,7 +263,8 @@ const UploadPage = () => {
                             value={file.clinicalNote || ''}
                             onChange={e => handleNoteChange(file.id, e.target.value)}
                             style={{
-                              width: '100%',
+                              width: '350px',
+                              maxWidth: '100%',
                               padding: '12px 16px',
                               borderRadius: '8px',
                               border: '2px solid #444444',
@@ -389,10 +390,10 @@ const UploadPage = () => {
               </Grid>
 
               {/* File Count Display */}
-              {files.length > 0 && (
+              {uploadedFiles.length > 0 && (
                 <Box sx={{ mb: 3, mt: 2 }}>
                   <Chip 
-                    label={getFileCountMessage()} 
+                    label={getFileCountMessage(uploadedFiles)} 
                     sx={{
                       fontSize: '0.9rem',
                       fontWeight: 600,
@@ -410,7 +411,7 @@ const UploadPage = () => {
               {uploading && (
                 <Paper sx={{ p: 3, mb: 3, bgcolor: '#1a1a1a' }}>
                   <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>
-                    Uploading {files.length} {files.length === 1 ? 'file' : 'files'}...
+                    Uploading {uploadedFiles.length} {uploadedFiles.length === 1 ? 'file' : 'files'}...
                   </Typography>
                   <LinearProgress 
                     variant="determinate" 
@@ -422,17 +423,17 @@ const UploadPage = () => {
                       {uploadProgress}% complete
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      {getTotalFileSize(files)} MB
+                      {getTotalFileSize(uploadedFiles)} MB
                     </Typography>
                   </Box>
                 </Paper>
               )}
 
               {/* File List (show first 10 and summary) */}
-              {files.length > 0 && !uploading && (
+              {uploadedFiles.length > 0 && !uploading && (
                 <Paper sx={{ p: 3, mb: 3, bgcolor: '#1a1a1a', border: '1px solid #333333' }}>
                   <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: '#00ffff' }}>
-                    New Files Ready ({files.length} total - {getTotalFileSize(files)} MB)
+                    New Files Ready ({uploadedFiles.length} total - {getTotalFileSize(uploadedFiles)} MB)
                   </Typography>
                   <Box sx={{ 
                     maxHeight: 200, 
@@ -442,7 +443,7 @@ const UploadPage = () => {
                     bgcolor: '#222'
                   }}>
                     <List dense>
-                      {files.slice(0, 10).map((file, idx) => (
+                      {uploadedFiles.slice(0, 10).map((file, idx) => (
                         <ListItem key={idx} sx={{ py: 1, borderBottom: '1px solid #f5f5f5' }}>
                           <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', gap: 2 }}>
                             {getFileIcon({ ...file, dataType })}
@@ -457,10 +458,10 @@ const UploadPage = () => {
                           </Box>
                         </ListItem>
                       ))}
-                      {files.length > 10 && (
+                      {uploadedFiles.length > 10 && (
                         <ListItem sx={{ py: 1, bgcolor: '#222' }}>
                           <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
-                            ... and {files.length - 10} more files
+                            ... and {uploadedFiles.length - 10} more files
                           </Typography>
                         </ListItem>
                       )}
@@ -545,7 +546,7 @@ const UploadPage = () => {
           </Card>
 
           {/* Quick Stats */}
-          {(uploadedFiles.length > 0 || files.length > 0) && (
+          {uploadedFiles.length > 0 && (
             <Card>
               <CardContent sx={{ p: 3 }}>
                 <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
@@ -557,7 +558,7 @@ const UploadPage = () => {
                     Total Files:
                   </Typography>
                   <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                    {uploadedFiles.length + files.length}
+                    {uploadedFiles.length}
                   </Typography>
                 </Box>
                 
@@ -566,7 +567,7 @@ const UploadPage = () => {
                     Total Size:
                   </Typography>
                   <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                    {(parseFloat(getTotalFileSize(uploadedFiles)) + parseFloat(getTotalFileSize(files))).toFixed(2)} MB
+                    {getTotalFileSize(uploadedFiles)} MB
                   </Typography>
                 </Box>
                 

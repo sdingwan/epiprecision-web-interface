@@ -31,7 +31,8 @@ import {
   HighlightOff,
   Download,
   Assessment,
-  FolderSpecial
+  FolderSpecial,
+  KeyboardArrowDown
 } from '@mui/icons-material';
 import ICReferenceTable from './ICReferenceTable';
 import { useFiles } from '../App';
@@ -593,8 +594,13 @@ const ResultsPage = () => {
                                             file?.clinicianApproval === 'disapproved' ? '#ffebee' : 'white',
                                     color: file?.clinicianApproval === 'approved' ? '#2e7d32' : 
                                            file?.clinicianApproval === 'disapproved' ? '#d32f2f' : 'inherit',
-                                    fontWeight: file?.clinicianApproval ? 600 : 'normal'
+                                    fontWeight: file?.clinicianApproval ? 600 : 'normal',
+                                    '& .MuiSelect-icon': {
+                                      color: 'rgba(0, 0, 0, 0.8)',
+                                      fontSize: '1.2rem'
+                                    }
                                   }}
+                                  IconComponent={KeyboardArrowDown}
                                 >
                                   <MenuItem value=""><em>Pending Review</em></MenuItem>
                                   <MenuItem value="approved">

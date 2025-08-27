@@ -144,6 +144,22 @@ const ResultsPage = () => {
     ? folders.find(f => f.id === selectedFolderId)
     : null;
 
+  // Sort files by IC number in ascending order
+  const sortFilesByICNumber = (fileList) => {
+    return [...fileList].sort((a, b) => {
+      // Extract IC number from filename (e.g., "IC_51_thresh.png" -> 51)
+      const getICNumber = (filename) => {
+        const match = filename.match(/IC_(\d+)/);
+        return match ? parseInt(match[1], 10) : 0;
+      };
+      
+      const aNumber = getICNumber(a.name);
+      const bNumber = getICNumber(b.name);
+      
+      return aNumber - bNumber;
+    });
+  };
+
   // PDF generation
   const handleDownloadPDF = async () => {
     const doc = new jsPDF();
@@ -553,7 +569,7 @@ const ResultsPage = () => {
           }}>
             {selectedFolder && selectedFolder.files && selectedFolder.files.length > 0 ? (
               <Grid container spacing={2}>
-                {selectedFolder.files.map((file) => {
+                {sortFilesByICNumber(selectedFolder.files).map((file) => {
                   const imagePreview = createImagePreview(file);
                   return (
                     <Grid item xs={12} key={file.id}>

@@ -51,17 +51,51 @@ const FileProvider = ({ children }) => {
       return;
     }
     
-    // Simulate AI output: assign each file a random category, explanation, and heatmap
+    // Use actual classification data: 0 = noise, 1 = SOZ
+    const classificationData = [
+      0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0
+    ];
+    
     const categorized = { rsn: [], noise: [], soz: [] };
-    uploadedFiles.forEach(file => {
-      const ai = AI_CATEGORIES[Math.floor(Math.random() * AI_CATEGORIES.length)];
+    
+    uploadedFiles.forEach((file, index) => {
+      // Extract IC number from filename (e.g., "IC_51_thresh.png" -> 51)
+      const getICNumber = (filename) => {
+        const match = filename.match(/IC_(\d+)/);
+        return match ? parseInt(match[1], 10) : 0;
+      };
+      
+      const icNumber = getICNumber(file.name);
+      
+      // Use IC number for classification (subtract 1 since IC numbers start at 1, but array indices start at 0)
+      const classification = icNumber > 0 ? classificationData[icNumber - 1] : classificationData[index % classificationData.length];
+      
+      let aiCategory, aiExplanation;
+      
+      if (classification === 0) {
+        // 0 = Noise
+        aiCategory = 'noise';
+        aiExplanation = 'Motion artifact detected.';
+      } else if (classification === 1) {
+        // 1 = SOZ
+        aiCategory = 'soz';
+        aiExplanation = 'Potential SOZ detected. Please review.';
+      } else {
+        // Fallback to RSN if somehow we get unexpected values
+        aiCategory = 'rsn';
+        aiExplanation = 'Clusters on grey matter.';
+      }
+      
       const fileWithAI = {
         ...file,
-        aiCategory: ai.key,
-        aiExplanation: ai.aiExplanation,
-        aiHeatmap: ai.aiHeatmap
+        aiCategory: aiCategory,
+        aiExplanation: aiExplanation,
+        aiHeatmap: '/AIHeatmap.png',
+        classificationValue: classification, // Store the original classification value for reference
+        icNumber: icNumber // Store the IC number for debugging
       };
-      categorized[ai.key].push(fileWithAI);
+      
+      categorized[aiCategory].push(fileWithAI);
     });
     
     setFolderData({

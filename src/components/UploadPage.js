@@ -47,7 +47,27 @@ const UploadPage = () => {
   console.log('UploadPage - dataType from navigation:', dataType);
  
   const processFiles = (selectedFiles) => {
-    const processedFiles = selectedFiles.map(file => ({
+    // Filter out system files and hidden files
+    const validFiles = selectedFiles.filter(file => {
+      const fileName = file.name;
+      // Exclude common system files
+      const systemFiles = [
+        '.DS_Store',           // macOS
+        'Thumbs.db',           // Windows
+        '.DS_Store?',          // macOS variants
+        '._.DS_Store',         // macOS metadata
+        '.Spotlight-V100',     // macOS Spotlight
+        '.Trashes',            // macOS Trash
+        'ehthumbs.db',         // Windows thumbnail cache
+        'Desktop.ini'          // Windows folder settings
+      ];
+      
+      return !systemFiles.some(sysFile => fileName.includes(sysFile)) && 
+             !fileName.startsWith('.') && 
+             !fileName.startsWith('_');
+    });
+
+    const processedFiles = validFiles.map(file => ({
       id: `${file.name}-${file.size}-${Date.now()}`,
       name: file.name,
       size: file.size,
@@ -189,6 +209,22 @@ const UploadPage = () => {
     setUploadedFiles(prevFiles => prevFiles.map(f => f.id === fileId ? { ...f, clinicalNote: note } : f));
   };
 
+  // Sort files by IC number in ascending order
+  const sortFilesByICNumber = (fileList) => {
+    return [...fileList].sort((a, b) => {
+      // Extract IC number from filename (e.g., "IC_51_thresh.png" -> 51)
+      const getICNumber = (filename) => {
+        const match = filename.match(/IC_(\d+)/);
+        return match ? parseInt(match[1], 10) : 0;
+      };
+      
+      const aNumber = getICNumber(a.name);
+      const bNumber = getICNumber(b.name);
+      
+      return aNumber - bNumber;
+    });
+  };
+
   return (
     <Box sx={{ minHeight: '80vh', p: 3 }}>
       <Grid container maxWidth="lg" spacing={4} sx={{ mx: 'auto' }}>
@@ -243,7 +279,7 @@ const UploadPage = () => {
                   </Typography>
                   {/* Clinical context input for each file */}
                   <List dense sx={{ mt: 2, width: '100%' }}>
-                    {uploadedFiles.map((file, idx) => (
+                    {sortFilesByICNumber(uploadedFiles).map((file, idx) => (
                       <ListItem key={file.id} alignItems="flex-start" sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', mb: 2, width: '100%' }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', gap: 2, mb: 1 }}>
                           {getFileIcon(file)}
@@ -443,7 +479,7 @@ const UploadPage = () => {
                     bgcolor: '#222'
                   }}>
                     <List dense>
-                      {uploadedFiles.slice(0, 10).map((file, idx) => (
+                      {sortFilesByICNumber(uploadedFiles).slice(0, 10).map((file, idx) => (
                         <ListItem key={idx} sx={{ py: 1, borderBottom: '1px solid #f5f5f5' }}>
                           <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', gap: 2 }}>
                             {getFileIcon({ ...file, dataType })}

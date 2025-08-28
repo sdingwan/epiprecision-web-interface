@@ -202,9 +202,12 @@ const ResultsPage = () => {
     doc.line(margin, y - 5, pageWidth - margin, y - 5);
     y += 5;
 
-    // Process each folder category
-    for (const folder of folders) {
-      if (!folder.files || folder.files.length === 0) continue;
+    // Process each folder category in priority order: SOZ, Noise, RSN
+    const pdfCategoryOrder = ['soz', 'noise', 'rsn'];
+    
+    for (const categoryId of pdfCategoryOrder) {
+      const folder = folders.find(f => f.id === categoryId);
+      if (!folder || !folder.files || folder.files.length === 0) continue;
 
       checkNewPage(30);
 
@@ -222,44 +225,72 @@ const ResultsPage = () => {
       y += 15;
 
       // Process each file in this category
-      for (let i = 0; i < folder.files.length; i++) {
-        const file = folder.files[i];
+      const sortedFiles = sortFilesByICNumber(folder.files);
+      for (let i = 0; i < sortedFiles.length; i++) {
+        const file = sortedFiles[i];
         
         checkNewPage(60); // Ensure enough space for file entry
 
         // File entry background
         doc.setFillColor(248, 249, 250);
-        doc.rect(margin, y - 5, contentWidth, 50, 'F');
+        doc.rect(margin, y - 5, contentWidth, 75, 'F'); // Increased height from 50 to 75 to accommodate AI Analysis text below heatmap
         
-        // File thumbnail area
-        const imgX = margin + 5;
-        const imgY = y;
-        const imgSize = 30;
+        // Original Brain Image (left side)
+        const brainImgX = margin + 5;
+        const brainImgY = y;
+        const brainImgSize = 30;
 
-        // Add image if available
+        // Add original brain image if available
         if (file.blobUrl) {
           try {
-            const imgData = await getImageDataUrl(file.blobUrl);
-            doc.addImage(imgData, 'JPEG', imgX, imgY, imgSize, imgSize);
+            const brainImgData = await getImageDataUrl(file.blobUrl);
+            doc.addImage(brainImgData, 'JPEG', brainImgX, brainImgY, brainImgSize, brainImgSize);
           } catch (e) {
             // Draw placeholder if image fails
             doc.setDrawColor(200, 200, 200);
-            doc.rect(imgX, imgY, imgSize, imgSize);
+            doc.rect(brainImgX, brainImgY, brainImgSize, brainImgSize);
             doc.setFontSize(8);
             doc.setTextColor(150, 150, 150);
-            doc.text('No Image', imgX + 8, imgY + 18);
+            doc.text('No Image', brainImgX + 8, brainImgY + 18);
           }
         } else {
           // Draw placeholder
           doc.setDrawColor(200, 200, 200);
-          doc.rect(imgX, imgY, imgSize, imgSize);
+          doc.rect(brainImgX, brainImgY, brainImgSize, brainImgSize);
           doc.setFontSize(8);
           doc.setTextColor(150, 150, 150);
-          doc.text('No Image', imgX + 8, imgY + 18);
+          doc.text('No Image', brainImgX + 8, brainImgY + 18);
         }
 
-        // File information area
-        const textX = imgX + imgSize + 10;
+        // AI Heatmap Image (right side)
+        const heatmapImgX = margin + (contentWidth * 0.7);
+        const heatmapImgY = y;
+        const heatmapImgSize = 30;
+
+        // Add AI heatmap if available
+        if (file.aiHeatmap) {
+          try {
+            const heatmapImgData = await getImageDataUrl(file.aiHeatmap);
+            doc.addImage(heatmapImgData, 'JPEG', heatmapImgX, heatmapImgY, heatmapImgSize, heatmapImgSize);
+          } catch (e) {
+            // Draw placeholder if heatmap fails
+            doc.setDrawColor(200, 200, 200);
+            doc.rect(heatmapImgX, heatmapImgY, heatmapImgSize, heatmapImgSize);
+            doc.setFontSize(8);
+            doc.setTextColor(150, 150, 150);
+            doc.text('No Heatmap', heatmapImgX + 2, heatmapImgY + 18);
+          }
+        } else {
+          // Draw placeholder
+          doc.setDrawColor(200, 200, 200);
+          doc.rect(heatmapImgX, heatmapImgY, heatmapImgSize, heatmapImgSize);
+          doc.setFontSize(8);
+          doc.setTextColor(150, 150, 150);
+          doc.text('No Heatmap', heatmapImgX + 2, heatmapImgY + 18);
+        }
+
+        // File information area (center, between images)
+        const textX = brainImgX + brainImgSize + 10;
         let textY = y + 5;
 
         // File name
@@ -294,9 +325,9 @@ const ResultsPage = () => {
           doc.text(clinicalNote, textX, textY);
         }
 
-        // AI Explanation area (right side)
-        const explanationX = margin + (contentWidth * 0.6);
-        let explanationY = y + 5;
+        // AI Explanation area (below the heatmap image)
+        const explanationX = heatmapImgX;
+        let explanationY = heatmapImgY + heatmapImgSize + 8;
         
         doc.setFontSize(9);
         doc.setFont('helvetica', 'bold');
@@ -311,11 +342,11 @@ const ResultsPage = () => {
           : (file.aiExplanation || 'No explanation available');
         
         // Split explanation into multiple lines if needed
-        const maxWidth = (contentWidth * 0.35);
+        const maxWidth = (contentWidth * 0.25);
         const explanationLines = doc.splitTextToSize(explanation, maxWidth);
         doc.text(explanationLines.slice(0, 3), explanationX, explanationY); // Max 3 lines
 
-        y += 55; // Move to next file position
+        y += 70; // Move to next file position (increased to accommodate AI Analysis text below heatmap)
       }
 
       y += 10; // Extra space between categories
@@ -687,12 +718,12 @@ const ResultsPage = () => {
                                 <Grid item xs={12} md={6}>
                                   <Box>
                                     <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: 'block', fontWeight: 600 }}>
-                                      AI Heatmap
+                                      Brain Slice
                                     </Typography>
                                     <Box
                                       component="img"
                                       src={file.aiHeatmap}
-                                      alt="AI Heatmap"
+                                      alt="Brain Slice"
                                       sx={{ 
                                         width: '100%',
                                         height: 300,

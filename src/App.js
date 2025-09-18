@@ -117,13 +117,16 @@ const FileProvider = ({ children }) => {
 };
 
 function App() {
-  const basename = (process.env.PUBLIC_URL || '/').replace(/https?:\/\/[^/]+/, '') || '/';
+  // For GitHub Pages, we need to extract just the repository name from PUBLIC_URL
+  const basename = process.env.NODE_ENV === 'production' 
+    ? '/epiprecision-web-interface' 
+    : '/';
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <FileProvider>
-    <Router basename={basename}>
+        <Router basename={basename}>
       <Navbar />
       <Container maxWidth="xl" sx={{ mt: 4 }}>
         <Routes>

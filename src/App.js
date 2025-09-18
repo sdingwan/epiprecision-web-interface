@@ -50,6 +50,7 @@ const FileProvider = ({ children }) => {
     ];
     
     const categorized = { rsn: [], noise: [], soz: [] };
+    const publicUrl = process.env.PUBLIC_URL || '';
     
     uploadedFiles.forEach((file, index) => {
       // Extract IC number from filename (e.g., "IC_51_thresh.png" -> 51)
@@ -83,7 +84,7 @@ const FileProvider = ({ children }) => {
         ...file,
         aiCategory: aiCategory,
         aiExplanation: aiExplanation,
-        aiHeatmap: '/AIHeatmap.png',
+        aiHeatmap: `${publicUrl}/AIHeatmap.png`,
         classificationValue: classification, // Store the original classification value for reference
         icNumber: icNumber // Store the IC number for debugging
       };
@@ -116,11 +117,13 @@ const FileProvider = ({ children }) => {
 };
 
 function App() {
+  const basename = (process.env.PUBLIC_URL || '/').replace(/https?:\/\/[^/]+/, '') || '/';
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <FileProvider>
-    <Router>
+    <Router basename={basename}>
       <Navbar />
       <Container maxWidth="xl" sx={{ mt: 4 }}>
         <Routes>

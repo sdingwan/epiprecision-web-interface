@@ -1,0 +1,19 @@
+{
+  "files": {
+    "main.css": "/epiprecision-web-interface/static/css/main.dbe1ed11.css",
+    "main.js": "/epiprecision-web-interface/static/js/main.73d996a5.js",
+    "static/js/239.88d0f197.chunk.js": "/epiprecision-web-interface/static/js/239.88d0f197.chunk.js",
+    "static/js/977.cbe242a2.chunk.js": "/epiprecision-web-interface/static/js/977.cbe242a2.chunk.js",
+    "static/js/455.5739b1d2.chunk.js": "/epiprecision-web-interface/static/js/455.5739b1d2.chunk.js",
+    "index.html": "/epiprecision-web-interface/index.html",
+    "main.dbe1ed11.css.map": "/epiprecision-web-interface/static/css/main.dbe1ed11.css.map",
+    "main.73d996a5.js.map": "/epiprecision-web-interface/static/js/main.73d996a5.js.map",
+    "239.88d0f197.chunk.js.map": "/epiprecision-web-interface/static/js/239.88d0f197.chunk.js.map",
+    "977.cbe242a2.chunk.js.map": "/epiprecision-web-interface/static/js/977.cbe242a2.chunk.js.map",
+    "455.5739b1d2.chunk.js.map": "/epiprecision-web-interface/static/js/455.5739b1d2.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.dbe1ed11.css",
+    "static/js/main.73d996a5.js"
+  ]
+}

@@ -9,7 +9,6 @@ import {
   Button, 
   Box, 
   Avatar, 
-  Chip,
   Grid,
   Paper,
   Divider

@@ -146,7 +146,7 @@ const LoginPage = () => {
       
       if (isSignUp) {
         // Create new account
-        const newUser = saveUser(formData);
+        saveUser(formData);
         setSuccessMessage('Account created successfully! Please log in with your credentials.');
         setIsSignUp(false);
         setFormData({

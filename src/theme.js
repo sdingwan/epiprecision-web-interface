@@ -250,11 +250,9 @@ const theme = createTheme({
         root: {
           borderRadius: 6,
           fontWeight: 500,
-          backgroundColor: '#2a2a2a',
-          color: '#e0e0e0',
-          border: '2px solid #00ffff',
-          color: '#00ffff',
           backgroundColor: '#111',
+          color: '#00ffff',
+          border: '2px solid #00ffff',
           '&.MuiChip-colorPrimary': {
             backgroundColor: '#111',
             color: '#00ffff',

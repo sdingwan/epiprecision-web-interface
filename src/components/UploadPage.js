@@ -21,7 +21,6 @@ import {
   Delete,
   Description,
   Image as ImageIcon,
-  CheckCircle,
   Info,
   PsychologyAlt
 } from '@mui/icons-material';

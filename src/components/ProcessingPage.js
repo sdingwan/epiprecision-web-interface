@@ -31,30 +31,6 @@ const steps = [
   { label: 'Review & Download', icon: <Assessment sx={{ color: '#e0e0e0' }} /> }
 ];
 
-// Custom blue connector for Stepper
-const BlueConnector = styled(StepConnector)(({ theme }) => ({
-  [`&.${stepConnectorClasses.alternativeLabel}`]: {
-    top: 22,
-  },
-  [`&.${stepConnectorClasses.active}`]: {
-    [`& .${stepConnectorClasses.line}`]: {
-      backgroundColor: '#2a2a2a',
-    },
-  },
-  [`&.${stepConnectorClasses.completed}`]: {
-    [`& .${stepConnectorClasses.line}`]: {
-      backgroundColor: '#2a2a2a',
-    },
-  },
-  [`& .${stepConnectorClasses.line}`]: {
-    height: 3,
-    border: 0,
-    backgroundColor: theme.palette.grey[300],
-    borderRadius: 1,
-    transition: 'background-color 0.3s ease',
-  },
-}));
-
 const CyanConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
     top: 22,

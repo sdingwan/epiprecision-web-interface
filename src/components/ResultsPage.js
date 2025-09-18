@@ -10,21 +10,15 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions,
-  List,
-  ListItem,
-  ListItemText,
   IconButton,
   Chip,
   MenuItem,
   Select,
   Paper,
-  Divider,
   Avatar,
   Container
 } from '@mui/material';
 import { 
-  Folder, 
   Close, 
   InsertDriveFile,
   CheckCircleOutline,
@@ -34,7 +28,6 @@ import {
   FolderSpecial,
   KeyboardArrowDown
 } from '@mui/icons-material';
-import ICReferenceTable from './ICReferenceTable';
 import { useFiles } from '../App';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';

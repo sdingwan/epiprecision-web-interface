@@ -9,13 +9,11 @@ import {
   Menu, 
   MenuItem,
   Chip,
-  Divider,
-  IconButton
+  Divider
 } from '@mui/material';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { 
   Person, 
-  AccountCircle, 
   Biotech,
   Dashboard,
   CloudUpload,

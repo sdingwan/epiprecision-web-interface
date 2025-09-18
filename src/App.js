@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ThemeProvider, CssBaseline } from '@mui/material';
+import { ThemeProvider, CssBaseline, Container } from '@mui/material';
 import theme from './theme';
 import Navbar from './components/Navbar';
 import LandingPage from './components/LandingPage';
@@ -8,7 +8,6 @@ import LoginPage from './components/LoginPage';
 import UploadPage from './components/UploadPage';
 import ProcessingPage from './components/ProcessingPage';
 import ResultsPage from './components/ResultsPage';
-import { Container } from '@mui/material';
 
 // Create context for sharing files between components
 const FileContext = createContext();
@@ -20,12 +19,6 @@ export const useFiles = () => {
   }
   return context;
 };
-
-  const AI_CATEGORIES = [
-    { key: 'rsn', color: 'green', label: 'RSN', aiExplanation: 'Clusters on grey matter.', aiHeatmap: '/AIHeatmap.png' },
-    { key: 'noise', color: 'yellow', label: 'Noise', aiExplanation: 'Motion artifact detected.', aiHeatmap: '/AIHeatmap.png' },
-    { key: 'soz', color: 'red', label: 'SOZ', aiExplanation: 'Potential SOZ detected. Please review.', aiHeatmap: '/AIHeatmap.png' }
-];
 
 const FileProvider = ({ children }) => {
   const [uploadedFiles, setUploadedFiles] = useState([]);

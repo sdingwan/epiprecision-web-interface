@@ -127,7 +127,7 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <FileProvider>
-    <Router>
+    <Router basename={process.env.PUBLIC_URL}>
       <Navbar />
       <Container maxWidth="xl" sx={{ mt: 4 }}>
         <Routes>

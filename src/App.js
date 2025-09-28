@@ -117,9 +117,9 @@ const FileProvider = ({ children }) => {
 };
 
 function App() {
-  // For GitHub Pages, we need to extract just the repository name from PUBLIC_URL
+  // For production deployment, use root path since we're deploying to demo.epiprecision.tech
   const basename = process.env.NODE_ENV === 'production' 
-    ? '/epiprecision-web-interface' 
+    ? '/' 
     : '/';
 
   return (

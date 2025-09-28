@@ -1,114 +1,112 @@
 # EpiPrecision Web Interface
 
-A React-based web interface for MRI data analysis using AI-powered IC processing for epilepsy research.
+A React + Material UI single-page application for demonstrating the EpiPrecision imaging workflow (upload ➝ processing ➝ clinician review). The project targets GitHub Pages and a custom domain at `https://demo.epiprecision.tech`.
 
-## Project Overview
+- Upload MRI/EEG/PET study files, simulate AI processing, and organise results into RSN / Noise / SOZ groupings.
+- Leverages React Router for multi-step navigation and a shared context provider for file state.
+- Dark-theme UX with clinician-focused touches and export-ready PDF summaries.
 
-This application provides a user-friendly interface for:
-- Uploading MRI data (100-200 images)
-- Running AI-powered IC Analysis
-- Processing data with EpiPrecision AI
-- Classifying images into RSN, Noise, and SOZ (Seizure Onset Zone) folders
+---
 
-## Project Structure
+## Prerequisites
+- **Node.js 18.x or 20.x** (Create React App 5 runs best on the current LTS releases).
+- **npm 9+** (bundled with Node). Yarn also works, but the scripts below assume npm.
+- macOS, Windows, or Linux with a modern browser for local testing.
 
-```
-src/
-├── App.js                    # Main app with routing
-├── index.js                  # React entry point
-├── index.css                 # Global styles
-└── components/
-    ├── Navbar.js             # Navigation bar
-    ├── LandingPage.js        # Login/data type selection
-    ├── UploadPage.js         # MRI image upload
-    ├── ProcessingPage.js     # AI-powered processing
-    ├── ResultsPage.js        # Final results display
-    └── ICReferenceTable.js   # IC types reference table
-
-public/
-├── index.html               # HTML template
-└── manifest.json           # Web app manifest
+Verify your toolchain:
+```bash
+node -v
+npm -v
 ```
 
-## How to Run
+---
 
-1. **Install Dependencies:**
+## Quick Start (Local Development)
+1. Install dependencies:
    ```bash
    npm install
    ```
-
-2. **Start Development Server:**
+2. Start the development server:
    ```bash
    npm start
    ```
+3. Open the app at `http://localhost:3000`. The dev server enables hot reloading, so edits under `src/` reload automatically.
 
-3. **Open in Browser:**
-   Navigate to `http://localhost:3000`
+> **Tip**: The landing page checks `localStorage` for login state. Use the mock login form to seed credentials when testing the authenticated flow.
 
-## Features
+---
 
-### 1. Landing Page
-- Mock user account display
-- Data type selection (MRI, EEG, PET, Other)
-- MRI is pre-selected and enabled
+## Building for Production
+Generate an optimised bundle under `build/`:
+```bash
+npm run build
+```
+The build output is what gets published to GitHub Pages. A successful build injects hashed asset names (e.g., `static/js/main.<hash>.js`) and respects the `homepage` setting in `package.json`, so paths remain correct for the custom domain.
 
-### 2. Upload Page
-- Multiple file upload for MRI images
-- Mock file list display
-- API integration placeholder (disabled)
+---
 
-### 3. Processing Page
-- Step-by-step workflow with progress indicators
-- Run AI Analysis button (simulated processing)
-- Run EPIK button (simulated processing)
-- Folder creation visualization
+## Deploying to GitHub Pages (demo.epiprecision.tech)
+Deployment is handled by the [`gh-pages`](https://github.com/tschaub/gh-pages) CLI listed in `devDependencies`.
 
-### 4. Results Page
-- Display of master folder with 3 subfolders:
-  - RSN Folder (blue)
-  - Noise Folder (orange)
-  - SOZ Folder (pink)
-- IC Reference Table with visual examples
+1. Ensure `public/CNAME` contains `demo.epiprecision.tech`. The deploy script copies it into the published branch so GitHub keeps the domain binding.
+2. Build and deploy with one command:
+   ```bash
+   npm run deploy
+   ```
+   Behind the scenes this runs `npm run build` and pushes the `build/` directory to the `gh-pages` branch.
+3. Wait 30–60 seconds for GitHub Pages to refresh, then load `https://demo.epiprecision.tech`. Use a hard refresh (⌘⇧R / Ctrl+F5) if you still see an old bundle.
 
-### 5. IC Reference Table
-- **Noise IC**: Small clusters on white matter and brain periphery
-- **RSN IC**: Clusters on grey matter (Resting State Network)
-- **SOZ IC**: Large cluster on both grey and white matter (Seizure Onset Zone)
+> **Why the black screen happens**: when the deployed HTML references `/epiprecision-web-interface/static/...`, the assets 404 on the custom domain. Rebuilding after updating `homepage` to `https://demo.epiprecision.tech` fixes the paths. Always deploy through `npm run deploy` so the generated `index.html` stays in sync.
 
-## Technology Stack
+---
 
-- **React 18** - Frontend framework
-- **React Router 6** - Client-side routing
-- **Material-UI (MUI) 5** - UI component library
-- **JavaScript ES6+** - Programming language
+## Available npm Scripts
+| Script | Purpose |
+| --- | --- |
+| `npm start` | Start CRA dev server at `http://localhost:3000`. |
+| `npm test` | Run Jest/Testing Library suites in watch mode. |
+| `npm run build` | Produce an optimised production bundle in `build/`. |
+| `npm run deploy` | Build and push `build/` to the `gh-pages` branch. |
+| `npm run eject` | Permanently eject CRA configuration (irreversible). |
 
-## Backend Integration Ready
+---
 
-The project is structured to easily integrate backend APIs:
-- All processing buttons are ready for API calls
-- File upload can be connected to backend endpoints
-- Authentication can be added to the landing page
-- Results can be fetched from backend services
+## Project Structure
+```
+src/
+├── App.js                  # Router + shared FileProvider context
+├── index.js                # React root rendering (StrictMode)
+├── index.css               # Global dark-theme styles
+├── theme.js                # Custom MUI theme overrides
+└── components/
+    ├── Navbar.js           # App navigation + mock auth menu
+    ├── LandingPage.js      # Data type selection & login gateway
+    ├── UploadPage.js       # File ingestion and validation
+    ├── ProcessingPage.js   # Simulated AI/EPIK processing steps
+    ├── ResultsPage.js      # AI classification review experience
+    └── ICReferenceTable.js # Reference data for IC types
 
-## Mock Features
+public/
+├── index.html              # CRA template (injects root div)
+├── CNAME                   # Custom domain for GitHub Pages
+├── manifest.json           # PWA metadata stub
+└── AIHeatmap.png           # Static asset used in results
+```
 
-Currently, all processing is simulated with timeouts for demonstration purposes:
-- File uploads show selected files but don't upload to server
-- AI and EPIK processing show progress indicators
-- Folder creation is visual only
+---
+
+## Troubleshooting
+- **Black screen on GitHub Pages**: Assets are missing. Run `npm run deploy` so `index.html` ships with `/static/...` asset URLs and confirm the latest bundle exists in the `gh-pages` branch.
+- **404s after deploy**: In GitHub Pages settings, ensure the source branch is `gh-pages` and that `public/CNAME` was published. Clear browser cache or open DevTools → Network → “Disable cache” to force reload.
+- **Outdated dependencies**: If installs fail, delete `node_modules` and `package-lock.json`, then rerun `npm install`. CRA 5 expects Node 14–20; newer majors may require `--legacy-peer-deps`.
+- **Local login loop**: Clear `localStorage` keys `userLoggedIn`, `userEmail`, `userName` from your browser to reset the mock auth state.
+
+---
 
 ## Future Enhancements
+- Wire upload + processing flows to real backend endpoints.
+- Replace mocked AI outputs with live classification results and PDFs.
+- Integrate SSO or production-ready authentication.
+- Add automated tests covering router flows and context behaviour.
 
-- Connect to actual AI processing backend
-- Implement real file upload with progress tracking
-- Add user authentication system
-- Integrate with EpiPrecision AI models
-- Add data visualization for IC analysis results
-
-## Development
-
-This project was created with Create React App and follows React best practices:
-- Functional components with hooks
-- Proper component separation
-- Responsive design with Material-UI
-- Router-based navigation for easy backend integration 
+For questions or deployment help, reach out to the EpiPrecision web team.

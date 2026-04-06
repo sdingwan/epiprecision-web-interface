@@ -2,7 +2,7 @@
   "name": "epiprecision-web-interface",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://demo.epiprecision.tech",
+  "homepage": "https://sdingwan.github.io/epiprecision-web-interface",
   "dependencies": {
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",

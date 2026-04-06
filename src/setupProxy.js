@@ -13,6 +13,7 @@ const UPLOAD_ROOT = path.join(FINAL_DIR, 'uploads');
 const DEFAULT_CNN_OUTPUT = path.join(FINAL_DIR, 'predictions_DL.csv');
 const DEFAULT_KL_OUTPUT = path.join(FINAL_DIR, 'predictions_KL.csv');
 const REPO_ROOT = path.resolve(__dirname, '..');
+const REPO_VENV_PYTHON = path.join(REPO_ROOT, '.venv', 'bin', 'python');
 
 fs.mkdirSync(UPLOAD_ROOT, { recursive: true });
 fs.mkdirSync(DBSCAN_OUTPUT_DIR, { recursive: true });
@@ -89,6 +90,7 @@ const runWithExecutable = (executable, env) =>
  */
 const runPipeline = async () => {
   const candidates = [
+    fs.existsSync(REPO_VENV_PYTHON) ? REPO_VENV_PYTHON : null,
     process.env.PYTHON_PATH,
     'python3',
     'python',

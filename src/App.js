@@ -12,19 +12,6 @@ import ResultsPage from './components/ResultsPage';
 // Create context for sharing files between components
 const FileContext = createContext();
 
-const arrayBufferToBase64 = (buffer) => {
-  let binary = '';
-  const bytes = new Uint8Array(buffer);
-  const chunkSize = 0x8000;
-
-  for (let i = 0; i < bytes.length; i += chunkSize) {
-    const chunk = bytes.subarray(i, i + chunkSize);
-    binary += String.fromCharCode.apply(null, chunk);
-  }
-
-  return window.btoa(binary);
-};
-
 export const useFiles = () => {
   const context = useContext(FileContext);
   if (!context) {
@@ -60,51 +47,6 @@ const FileProvider = ({ children }) => {
     return match ? parseInt(match[1], 10) : null;
   };
 
-  const uploadCaseToServer = useCallback(async () => {
-    const filePayload = await Promise.all(
-      uploadedFiles.map(async (file) => {
-        if (!file.originalFile) {
-          return null;
-        }
-        const arrayBuffer = await file.originalFile.arrayBuffer();
-        const base64Content = arrayBufferToBase64(arrayBuffer);
-        return {
-          name: file.name,
-          relativePath: file.relativePath || file.name,
-          content: base64Content
-        };
-      })
-    );
-
-    const validFiles = filePayload.filter(Boolean);
-    if (validFiles.length === 0) {
-      throw new Error('No files available to upload.');
-    }
-
-    const response = await fetch('/api/upload-case', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ files: validFiles })
-    });
-
-    if (!response.ok) {
-      let errorMessage = 'Failed to upload case files.';
-      try {
-        const errorBody = await response.json();
-        if (errorBody?.error) {
-          errorMessage = errorBody.error;
-        }
-      } catch {
-        // ignore parse errors
-      }
-      throw new Error(errorMessage);
-    }
-
-    return response.json();
-  }, [uploadedFiles]);
-
   const distributeFiles = useCallback(async () => {
     if (!uploadedFiles || uploadedFiles.length === 0) {
       console.warn("No files to distribute");
@@ -119,109 +61,99 @@ const FileProvider = ({ children }) => {
       });
       return { results: [], summary: null };
     }
-    
+
     setIsAnalyzing(true);
     setAnalysisError(null);
 
     try {
-      await uploadCaseToServer();
-
-      const response = await fetch('/api/run-analysis', {
-        method: 'POST'
-      });
-
-      if (!response.ok) {
-        let errorMessage = 'Failed to run analysis.';
-        try {
-          const errorBody = await response.json();
-          if (errorBody?.error) {
-            errorMessage = errorBody.error;
-          }
-        } catch (errorResponse) {
-          // Ignore JSON parse errors
-        }
-        throw new Error(errorMessage);
-      }
-
-      const data = await response.json();
-      setAnalysisResults(data.results || []);
-      setAnalysisSummary(data.summary || null);
-
-      const resultsMap = new Map(
-        (data.results || []).map((item) => [Number(item.ic), item])
-      );
-
+      const classificationData = [
+        0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 1, 1, 1,
+        0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0,
+        0, 0, 1, 0, 1, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1,
+        1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0,
+        1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0
+      ];
       const categorized = { rsn: [], noise: [], soz: [] };
       const publicUrl = process.env.PUBLIC_URL || '';
-      const usedIcSet = new Set();
+      const results = [];
 
-      uploadedFiles.forEach((file) => {
+      uploadedFiles.forEach((file, index) => {
         if (!file.name?.toLowerCase().includes('_thresh')) {
           return;
         }
+
         const icNumber = getICNumber(file.name);
-        const analysis = icNumber != null ? resultsMap.get(icNumber) : null;
+        const classification =
+          icNumber && icNumber > 0
+            ? classificationData[icNumber - 1]
+            : classificationData[index % classificationData.length];
 
-        if (!analysis) {
-          return;
-        }
+        let aiCategory;
+        let aiExplanation;
 
-        if (usedIcSet.has(icNumber)) {
-          return;
-        }
-        usedIcSet.add(icNumber);
-
-        let aiCategory = 'rsn';
-        let aiExplanation = 'Deep learning label suggests resting state network.';
-
-        if (analysis.isSoz) {
-          aiCategory = 'soz';
-          aiExplanation =
-            analysis.reason || 'Pipeline flagged this component as SOZ.';
-        } else if (analysis.dlLabel === 0 || analysis.klPrediction === 3) {
+        if (classification === 0) {
           aiCategory = 'noise';
-          aiExplanation =
-            analysis.reason || 'Pipeline labelled this component as noise.';
+          aiExplanation = 'Motion artifact detected.';
+        } else if (classification === 1) {
+          aiCategory = 'soz';
+          aiExplanation = 'Potential SOZ detected. Please review.';
         } else {
           aiCategory = 'rsn';
-          aiExplanation =
-            analysis.reason ||
-            'Pipeline labelled this component as resting-state / non-SOZ.';
+          aiExplanation = 'Clusters on grey matter.';
         }
-
-        const aiHeatmap = analysis?.dbscanImage || `${publicUrl}/AIHeatmap.png`;
 
         const fileWithAI = {
           ...file,
           aiCategory,
           aiExplanation,
-          aiHeatmap,
+          aiHeatmap: `${publicUrl}/AIHeatmap.png`,
           icNumber,
-          analysisDetails: analysis || null
+          analysisDetails: {
+            ic: icNumber,
+            isSoz: aiCategory === 'soz',
+            dlLabel: classification,
+            klPrediction: classification === 1 ? 3 : 1,
+            reason: aiExplanation
+          }
         };
 
-        if (!categorized[aiCategory]) {
-          categorized[aiCategory] = [];
-        }
         categorized[aiCategory].push(fileWithAI);
+        results.push({
+          ic: icNumber,
+          isSoz: aiCategory === 'soz',
+          dlLabel: classification,
+          klPrediction: classification === 1 ? 3 : 1,
+          reason: aiExplanation
+        });
       });
 
+      const summary = {
+        totalComponents: results.length,
+        sozCount: categorized.soz.length,
+        patientIsSoz: categorized.soz.length > 0,
+        sozIcs: categorized.soz
+          .map((file) => file.icNumber)
+          .filter((value) => value != null)
+      };
+
+      setAnalysisResults(results);
+      setAnalysisSummary(summary);
       setFolderData({
         rsn: categorized.rsn || [],
         noise: categorized.noise || [],
         soz: categorized.soz || []
       });
       setProcessingComplete(true);
-      return data;
+      return { results, summary };
     } catch (error) {
-      console.error('Error running analysis pipeline:', error);
+      console.error('Error distributing demo analysis results:', error);
       setAnalysisError(error.message);
       setProcessingComplete(false);
       throw error;
     } finally {
       setIsAnalyzing(false);
     }
-  }, [uploadedFiles, uploadCaseToServer]);
+  }, [uploadedFiles]);
 
   return (
     <FileContext.Provider value={{
@@ -244,9 +176,9 @@ const FileProvider = ({ children }) => {
 };
 
 function App() {
-  // For production deployment, use root path since we're deploying to demo.epiprecision.tech
+  // GitHub Pages project sites are served from /<repo-name> in production.
   const basename = process.env.NODE_ENV === 'production' 
-    ? '/' 
+    ? '/epiprecision-web-interface'
     : '/';
 
   return (
